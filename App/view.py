@@ -22,6 +22,8 @@
 
 import config as cf
 import sys
+default_limit = 1000
+sys.setrecursionlimit(default_limit*10)
 import controller
 from DISClib.ADT import list as lt
 from DISClib.ADT import stack as st
