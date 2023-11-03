@@ -46,12 +46,15 @@ def new_controller():
     """
         Se crea una instancia del controlador
     """
+    control = controller.new_controller()
+    return control
     #TODO: Llamar la función del controlador donde se crean las estructuras de datos
     pass
 
 
 def print_menu():
     print("Bienvenido")
+    print("0- Inicializar analizador")
     print("1- Cargar información")
     print("2- Ejecutar Requerimiento 1")
     print("3- Ejecutar Requerimiento 2")
@@ -64,10 +67,13 @@ def print_menu():
     print("0- Salir")
 
 
-def load_data(control):
+def load_data(control,data_size):
     """
     Carga los datos
     """
+    control= controller.load_data(control,data_size)
+    #print(control)
+    print(controller.size(control['lista_temblores']))
     #TODO: Realizar la carga de datos
     pass
 
@@ -157,8 +163,9 @@ if __name__ == "__main__":
         print_menu()
         inputs = input('Seleccione una opción para continuar\n')
         if int(inputs) == 1:
+            data= int(input("Ingrese el numeri "))
             print("Cargando información de los archivos ....\n")
-            data = load_data(control)
+            print(load_data(control,data))
         elif int(inputs) == 2:
             print_req_1(control)
 

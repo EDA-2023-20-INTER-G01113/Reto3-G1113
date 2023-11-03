@@ -36,21 +36,51 @@ def new_controller():
     """
     Crea una instancia del modelo
     """
+    control=model.new_data_structs()
+    return control
     #TODO: Llamar la función del modelo que crea las estructuras de datos
     pass
 
 
 # Funciones para la carga de datos
 
-def load_data(control, filename):
+
+def load_data(control, data_size):
     """
     Carga los datos del reto
     """
     # TODO: Realizar la carga de datos
-    pass
+    file = load(data_size)
+    file_name = cf.data_dir  + file
+    input_file = csv.DictReader(open(file_name, encoding='utf-8'))
+    for temblor in input_file:
+        model.add_data_ms(control, temblor)
+    return control
+
+
+def load(data_size):
+    if data_size==1:
+        temblor =  'temblores-utf8-small.csv'
+    elif data_size==2:
+        temblor =  'temblores-utf8-5pct.csv'
+    elif data_size==3:
+        temblor =  'temblores-utf8-10pct.csv'
+    elif data_size==4:
+        temblor =  'temblores-utf8-20pct.csv'
+    elif data_size==5:
+        temblor =   'temblores-utf8-30pct.csv'
+    elif data_size==6:
+        temblor  =   'temblores-utf8-50pct.csv'
+    elif data_size==7:
+        temblor =  'temblores-utf8-80pct.csv'
+    elif data_size==8:
+        temblor =  'temblores-utf8-large.csv'
+    return temblor
 
 
 # Funciones de ordenamiento
+def size(mapa):
+    return model.data_size(mapa)
 
 def sort(control):
     """
