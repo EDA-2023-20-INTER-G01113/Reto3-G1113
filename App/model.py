@@ -90,6 +90,7 @@ def updateDate(mapa, data):
     else:
         datentry = me.getValue(entry)
     add_data(datentry, data)
+    lt.addLast(datentry["list"],data)
     return mapa
 #def updateDate(mapa, data):
     occurreddate = data['time']
@@ -125,7 +126,9 @@ def new_data():
     data["By_depth"]=mp.newMap(numelements=30,
                                      maptype='PROBING',
                                      cmpfunction=compare_elements)
+    data["list"]= lt.newList("ARRAY_LIST")
     return data
+
 def add_data(structs,data):
     mapa= structs["By_depth"]
     entry= mp.get(mapa,data["depth"])

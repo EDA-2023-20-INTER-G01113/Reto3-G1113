@@ -165,7 +165,7 @@ if __name__ == "__main__":
         if int(inputs) == 1:
             data= int(input("Ingrese el numeri "))
             print("Cargando información de los archivos ....\n")
-            print(load_data(control,data))
+            load_data(control,data)
         elif int(inputs) == 2:
             print_req_1(control)
 
