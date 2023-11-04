@@ -118,7 +118,17 @@ def print_req_4(control):
         Función que imprime la solución del Requerimiento 4 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 4
-    pass
+    min_sig = float(input("Ingrese la significancia mínima del evento: "))
+    max_gap = float(input("Ingrese la distancia azimutal máxima del evento: "))
+
+    results, length, dates = controller.req_4(control, min_sig, max_gap)
+    
+    elems = [x for x in lt.iterator(results)]
+
+    print(f'Total different dates: {dates}')
+    print(f'Total events between dates {length}')
+    print(f'\n')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
 
 
 def print_req_5(control):

@@ -65,6 +65,12 @@ def new_data_structs():
                                       cmpfunction=compareDates)
     control['temblores']= om.newMap(omaptype='BST',
                                       cmpfunction=compareDates)
+    
+    control['temblores_sig']= om.newMap(omaptype='RBT',
+                                        cmpfunction=compareFloats)
+    
+    control['temblores_gap']= om.newMap(omaptype='RBT',
+                                        cmpfunction=compareFloats)
     return control  
 
 
@@ -77,7 +83,8 @@ def add_data_ms(control, data):
     lt.addLast(control['lista_temblores'], data)
     updateDate(control["temblores_mag"],data)
     uptime(control["temblores"],data)
-
+    up_significance(control, data)
+    up_gap(control, data)
     return control
     #TODO: Crear la función para agregar elementos a una lista
     pass
@@ -105,6 +112,35 @@ def uptime(mapa,data):
         datentry = me.getValue(entry)
     lt.addLast(datentry,data)
     return mapa
+
+def up_significance(data_structs, data):
+    mapa = data_structs['temblores_sig']
+    info = nuevo(data)
+    if not info['sig']:
+        info['sig']=0
+    sig = info['sig']
+    entry = om.get(mapa, sig)
+    if entry is None:
+        dataentry = lt.newList("ARRAY_LIST",cmpfunction=cmp_quakes)
+    else:
+        dataentry = me.getValue(entry)
+    lt.addLast(dataentry, info)
+    om.put(mapa, sig, dataentry)
+
+def up_gap(data_structs, data):
+    mapa = data_structs['temblores_gap']
+    info = nuevo(data)
+    if not info['gap']:
+        info['gap']=0
+    gap= round(float(info['gap']),3)
+    entry = om.get(mapa, gap)
+    if entry is None:
+        dataentry = lt.newList("ARRAY_LIST",cmpfunction=cmp_quakes)
+    else:
+        dataentry = me.getValue(entry)
+    lt.addLast(dataentry, info)
+    om.put(mapa, gap, dataentry)
+
 # Funciones para creacion de datos
 
 def new_data():
@@ -240,7 +276,7 @@ def req_2(analyzer,initialmag, finalmag ):
         lt.addFirst(lista,diccionario)
     return lista,total
     # TODO: Realizar el requerimiento 2
-    pass
+    
 def nuevo(cada):
     fecha = datetime.datetime.strptime(cada["time"], "%Y-%m-%dT%H:%M:%S.%fZ")
     dates = fecha.strftime('%Y-%m-%d %H:%M:%S')
@@ -255,12 +291,51 @@ def req_3(data_structs):
     pass
 
 
-def req_4(data_structs):
+def req_4(data_structs, min_sig, max_gap):
     """
     Función que soluciona el requerimiento 4
     """
     # TODO: Realizar el requerimiento 4
-    pass
+    sig_om = data_structs['temblores_sig']
+    gap_om = data_structs['temblores_gap']
+
+    results = lt.newList("ARRAY_LIST", cmpfunction=cmp_quakes)
+
+    max_sig = om.maxKey(sig_om)
+    sig_keys = om.keys(sig_om, min_sig, max_sig)
+    min_gap = om.minKey(gap_om)
+    gap_keys = om.keys(gap_om, min_gap, max_gap)
+
+    entries_map = mp.newMap(lt.size(sig_keys)*2.1, 
+                            maptype="PROBING", 
+                            loadfactor=0.5,
+                            cmpfunction=compare_elements)
+
+    dates_map = mp.newMap(lt.size(sig_keys), 
+                            maptype="PROBING", 
+                            loadfactor=0.5,
+                            cmpfunction=compare_elements)
+    for key in lt.iterator(sig_keys):
+        quakes_list = me.getValue(om.get(sig_om,key))
+        for quake in lt.iterator(quakes_list):
+            mp.put(entries_map, quake['code'], quake)
+    
+    for key in lt.iterator(gap_keys):
+        quakes_list = me.getValue(om.get(gap_om, key))
+        for quake in lt.iterator(quakes_list):
+            if mp.contains(entries_map, quake['code']):
+                lt.addLast(results, quake)
+                if not mp.contains(dates_map, quake['time']):
+                    mp.put(dates_map, quake['time'],1)
+
+    merg.sort(results, req4_sort_criteria)
+    size = lt.size(results)
+    dates = mp.size(dates_map)
+
+    return_list = results
+    
+    return return_list, size, dates
+
 
 
 def req_5(data_structs):
@@ -307,6 +382,7 @@ def compare(data_1, data_2):
     elif data_1>data_2:
         return 1
     return -1
+
 def compareDates(date1, date2):
     """
     Compara dos fechas
@@ -318,6 +394,14 @@ def compareDates(date1, date2):
     else:
         return -1
 
+def compareFloats(data1, data2):
+
+    if (float(data1) == float(data2)):
+        return 0
+    elif (float(data1) > float(data2)):
+        return 1
+    else:
+        return -1
 # Funciones de ordenamiento
     
 
@@ -345,9 +429,24 @@ def compare_results_list(data1, data2):
     else :
         return -1
 
+def cmp_quakes(data1, data2):
+    if data1['code']==data2['code']:
+        return 0
+    elif data1['code']>data2['code']:
+        return 1
+    else:
+        return -1
+    
 def sort(data_structs):
     """
     Función encargada de ordenar la lista con los datos
     """
     #TODO: Crear función de ordenamiento
     pass
+
+def req4_sort_criteria(data1, data2):
+    date1=data1['time']
+    date2=data2['time']
+    if date1>date2:
+        return True
+    return False

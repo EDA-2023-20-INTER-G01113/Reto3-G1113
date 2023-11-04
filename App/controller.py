@@ -26,6 +26,7 @@ import time
 import csv
 csv.field_size_limit(2147483647)
 import tracemalloc
+from DISClib.ADT import list as lt
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -132,13 +133,16 @@ def req_3(control):
     pass
 
 
-def req_4(control):
+def req_4(control, min_sig, max_gap):
     """
     Retorna el resultado del requerimiento 4
     """
     # TODO: Modificar el requerimiento 4
-    pass
-
+    results, leng, dates = model.req_4(control, min_sig, max_gap)
+    r_size = lt.size(results)
+    if r_size>6:
+        return model.get_data_3(results,r_size),leng, dates
+    return results, leng, dates
 
 def req_5(control):
     """
