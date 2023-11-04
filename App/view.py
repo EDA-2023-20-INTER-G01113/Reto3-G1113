@@ -86,12 +86,14 @@ def print_data(control, id):
     #TODO: Realizar la función para imprimir un elemento
     pass
 
-def print_req_1(control):
+def print_req_1(control,anio_inicio,anio_final):
     """
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    pass
+    respuesta,tamanio=controller.req_1(control, anio_inicio,anio_final)
+    print("El total de eventos sismicos en este rango de fecha es: " + str(tamanio))
+    print(respuesta)
 
 
 def print_req_2(control,im,fm):

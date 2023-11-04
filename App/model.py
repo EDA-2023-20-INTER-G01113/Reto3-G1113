@@ -65,6 +65,8 @@ def new_data_structs():
                                       cmpfunction=compareDates)
     control['temblores']= om.newMap(omaptype='BST',
                                       cmpfunction=compareDates)
+    #control["temblores_por_fecha"] = om.newMap(omaptype="RBT", 
+    #                                           cmpfunction=compareDates)
     return control  
 
 
@@ -77,10 +79,11 @@ def add_data_ms(control, data):
     lt.addLast(control['lista_temblores'], data)
     updateDate(control["temblores_mag"],data)
     uptime(control["temblores"],data)
+    #uptime(control["temblores_por_fecha"],data)
 
     return control
     #TODO: Crear la función para agregar elementos a una lista
-    pass
+    
 def updateDate(mapa, data):
     mag = round(float(data['mag']),3)
     entry = om.get(mapa, mag)
@@ -89,7 +92,7 @@ def updateDate(mapa, data):
         om.put(mapa,mag, datentry)
     else:
         datentry = me.getValue(entry)
-    add_data(datentry, data)
+    add_data_ms(datentry, data)
     lt.addLast(datentry["By_mag"],data)
     return mapa
 
@@ -103,7 +106,8 @@ def uptime(mapa,data):
         om.put(mapa, dates, datentry)
     else:
         datentry = me.getValue(entry)
-    lt.addLast(datentry,data)
+    add_data_ms(datentry,data)
+    lt.addLast(datentry["time"],data)
     return mapa
 # Funciones para creacion de datos
 
@@ -115,9 +119,11 @@ def new_data():
     data["By_depth"]=om.newMap(omaptype='BST',
                                       cmpfunction=compareDates)
     data["By_mag"]= lt.newList("ARRAY_LIST")
+    
+    data["By_time"] = lt.newList("ARRAY_LIST")
     return data
 
-def add_data(structs,data):
+#def add_data(structs,data):
     mapa= structs["By_depth"]
     entry= om.get(mapa,data["depth"])
     if entry:
@@ -127,6 +133,7 @@ def add_data(structs,data):
         om.put(mapa,data["depth"],lista)
     lt.addLast(lista,data)
     return structs
+
 #def add_data_by_date(structs,data):
     mapa= structs["By_date"]
     occurreddate = data['time']
@@ -202,13 +209,37 @@ def data_size(data_structs):
     pass
 
 
-def req_1(data_structs):
+def req_1(control, fecha_incio, fecha_final):
     """
     Función que soluciona el requerimiento 1
     """
     # TODO: Realizar el requerimiento 1
-    pass
-
+    lst = om.values(control["temblores"],fecha_incio, fecha_final)
+    total = 0
+    lista_final = lt.newList("ARRAY_LIST")
+    for lst_fecha in lt.iterator(lst):
+        respuesta = me.getValue(om.get(control["temblores"],lst_fecha))
+        tamanio = lt.size(respuesta["By_time"])
+        total += tamanio
+        dic = {"time" : lst_fecha, "mag": lst_fecha, "Adicional": lt.newList("ARRAY_LIST")}
+        info_adicional = dic["Adicional"]
+        
+        orden = merg.sort(respuesta["By_time"], compare_results_list)
+        if tamanio < 6:
+            for ele in lt.iterator(orden):
+                d = nuevo(ele)
+                lt.addLast(info_adicional,d)
+            else:
+                for date in range(1,4):
+                    info = lt.getElement(orden,date)
+                    info = nuevo(info)
+                    lt.addLast(info_adicional,info)
+                for date in range(0,3): 
+                    info = lt.getElement(orden,date)
+                    info = lt.addLast(info_adicional,info)
+                    lt.addLast(info_adicional,info)
+            lt.addFirst(lista_final,info_adicional)
+        return lista_final, total
 
 def req_2(analyzer,initialmag, finalmag ):
     """

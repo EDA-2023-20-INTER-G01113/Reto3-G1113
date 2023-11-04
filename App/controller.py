@@ -103,12 +103,16 @@ def get_data(control, id):
     pass
 
 
-def req_1(control):
+def req_1(control,anio_inicio,anio_final):
     """
     Retorna el resultado del requerimiento 1
     """
     # TODO: Modificar el requerimiento 1
-    pass
+    respuesta,total =model.req_1(control,anio_inicio,anio_final)
+    tamanio = size(respuesta)
+    if tamanio>6:
+        return model.get_data_3(respuesta,tamanio),total
+    return respuesta,total
 
 
 def req_2(control,im,fm):
