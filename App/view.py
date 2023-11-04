@@ -94,10 +94,13 @@ def print_req_1(control):
     pass
 
 
-def print_req_2(control):
+def print_req_2(control,im,fm):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
+    res,tamano=controller.req_2(control,im,fm)
+    print("El total de resultado es de : "+ str(tamano))
+    print(res)
     # TODO: Imprimir el resultado del requerimiento 2
     pass
 
@@ -180,7 +183,9 @@ Ingrese 8 si quiere cargar TODOS los datos."""
             print_req_1(control)
 
         elif int(inputs) == 3:
-            print_req_2(control)
+            im= float(input("INICIAL: "))
+            fm=float(input("FINAL: "))
+            print_req_2(control,im,fm)
 
         elif int(inputs) == 4:
             print_req_3(control)
