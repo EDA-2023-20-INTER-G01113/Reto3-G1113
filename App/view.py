@@ -71,9 +71,10 @@ def load_data(control,data_size):
     """
     Carga los datos
     """
-    control= controller.load_data(control,data_size)
+    control,tamaño, lista= controller.load_data(control,data_size)
     #print(control)
-    print(controller.size(control['lista_temblores']))
+    print("Total de temblores "+str(tamaño))
+    print(lista)
     #TODO: Realizar la carga de datos
     pass
 
@@ -93,10 +94,13 @@ def print_req_1(control):
     pass
 
 
-def print_req_2(control):
+def print_req_2(control,im,fm):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
+    res,tamano=controller.req_2(control,im,fm)
+    print("El total de resultado es de : "+ str(tamano))
+    print(res)
     # TODO: Imprimir el resultado del requerimiento 2
     pass
 
@@ -163,14 +167,25 @@ if __name__ == "__main__":
         print_menu()
         inputs = input('Seleccione una opción para continuar\n')
         if int(inputs) == 1:
-            data= int(input("Ingrese el numeri "))
+            message = """
+Ingrese 1 si quiere cargar una muestra pequeña de los datos. 
+Ingrese 2 si quiere cargar el 5 porciento de los datos.
+Ingrese 3 si quiere cargar el 10 porciento de los datos.
+Ingrese 4 si quiere cargar el 20 porciento de los datos
+Ingrese 5 si quiere cargar el 30 porciento de los datos.
+Ingrese 6 si quiere cargar el 50 porciento de los datos
+Ingrese 7 si quiere cargar el 80 porciento de los datos
+Ingrese 8 si quiere cargar TODOS los datos."""
+            data = int(input(message))
             print("Cargando información de los archivos ....\n")
-            print(load_data(control,data))
+            load_data(control,data)
         elif int(inputs) == 2:
             print_req_1(control)
 
         elif int(inputs) == 3:
-            print_req_2(control)
+            im= float(input("INICIAL: "))
+            fm=float(input("FINAL: "))
+            print_req_2(control,im,fm)
 
         elif int(inputs) == 4:
             print_req_3(control)

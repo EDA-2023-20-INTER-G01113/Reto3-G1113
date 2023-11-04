@@ -82,7 +82,7 @@ def add_data_ms(control, data):
     #TODO: Crear la función para agregar elementos a una lista
     pass
 def updateDate(mapa, data):
-    mag = data['mag']
+    mag = round(float(data['mag']),3)
     entry = om.get(mapa, mag)
     if entry is None:
         datentry = new_data()
@@ -90,18 +90,7 @@ def updateDate(mapa, data):
     else:
         datentry = me.getValue(entry)
     add_data(datentry, data)
-    return mapa
-#def updateDate(mapa, data):
-    occurreddate = data['time']
-    fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
-    dates = fecha.strftime('%Y-%m-%dT%H:%M')
-    entry = om.get(mapa, dates)
-    if entry is None:
-        datentry = new_data()
-        om.put(mapa, dates, datentry)
-    else:
-        datentry = me.getValue(entry)
-    add_data(datentry, data)
+    lt.addLast(datentry["By_mag"],data)
     return mapa
 
 def uptime(mapa,data):
@@ -119,24 +108,38 @@ def uptime(mapa,data):
 # Funciones para creacion de datos
 
 def new_data():
-    """
+    """ 
     Crea una nueva estructura para modelar los datos
     """
     data= {}
-    data["By_depth"]=mp.newMap(numelements=30,
-                                     maptype='PROBING',
-                                     cmpfunction=compare_elements)
+    data["By_depth"]=om.newMap(omaptype='BST',
+                                      cmpfunction=compareDates)
+    data["By_mag"]= lt.newList("ARRAY_LIST")
     return data
+
 def add_data(structs,data):
     mapa= structs["By_depth"]
-    entry= mp.get(mapa,data["depth"])
+    entry= om.get(mapa,data["depth"])
     if entry:
         lista= me.getValue(entry)
     else:
         lista= lt.newList("ARRAY_LIST")
-        mp.put(mapa,data["depth"],lista)
+        om.put(mapa,data["depth"],lista)
     lt.addLast(lista,data)
     return structs
+#def add_data_by_date(structs,data):
+    mapa= structs["By_date"]
+    occurreddate = data['time']
+    fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
+    dates = fecha.strftime('%Y-%m-%dT%H:%M')
+    entry = om.get(mapa, dates)
+    if entry is None:
+        datentry = lt.newList("ARRAY_LIST")
+        om.put(mapa, dates, datentry)
+    else:
+        datentry = me.getValue(entry)
+    lt.addLast(datentry,data)
+    return mapa
 
 
     #TODO: Crear la función para estructurar los datos
@@ -151,6 +154,36 @@ def compare_elements(keyname, element):
         return -1
 
 # Funciones de consulta
+def get_data_5(data_structs,tamano):
+    """
+    Retorna un dato a partir de su ID
+    """
+    #TODO: Crear la función para obtener un dato de una lista   
+    resultados = lt.newList("ARRAY_LIST")
+    lt.addFirst(resultados,lt.firstElement(data_structs))
+    for b in range(2,6):
+        p = lt.getElement(data_structs, b)
+        lt.addLast(resultados, p)
+    for b in range (0,5):
+        p = lt.getElement(data_structs, (tamano-4+b))
+        lt.addLast(resultados, p)
+    return resultados
+
+def get_data_3(data_structs,tamano):
+    """
+    Retorna un dato a partir de su ID
+    """
+    #TODO: Crear la función para obtener un dato de una lista   
+    resultados = lt.newList("ARRAY_LIST")
+    lt.addFirst(resultados,lt.firstElement(data_structs))
+    for b in range(2,4):
+        p = lt.getElement(data_structs, b)
+        lt.addLast(resultados, p)
+    for b in range (0,3):
+        p = lt.getElement(data_structs, (tamano-2+b))
+        lt.addLast(resultados, p)
+    return resultados
+
 
 def get_data(data_structs, id):
     """
@@ -177,14 +210,43 @@ def req_1(data_structs):
     pass
 
 
-def req_2(data_structs):
+def req_2(analyzer,initialmag, finalmag ):
     """
     Función que soluciona el requerimiento 2
     """
+    total=0
+    lista= lt.newList("SINGLE_LINKED")
+    lst = om.keys(analyzer['temblores_mag'], initialmag, finalmag)
+    for lstmag in lt.iterator(lst):
+        result= me.getValue(om.get(analyzer['temblores_mag'],lstmag))
+        tamano=lt.size(result["By_mag"])
+        total+=tamano
+        diccionario={"mag":lstmag,"Events":tamano,"Details":lt.newList("ARRAY_LIST")}
+        detalles=diccionario["Details"]
+        ordenada= merg.sort(result["By_mag"],compare_results_list)
+        if tamano<6:
+            for cada in lt.iterator(ordenada):
+                dato=nuevo(cada)
+                lt.addLast(detalles,dato)
+        else:
+            for b in range(1,4):
+                dato = lt.getElement(ordenada, b)
+                dato=nuevo(dato)
+                lt.addLast(detalles,dato)
+            for b in range (0,3):
+                dato = lt.getElement(ordenada, (tamano-2+b))
+                dato=nuevo(dato)
+                lt.addLast(detalles,dato)
+        lt.addFirst(lista,diccionario)
+    return lista,total
     # TODO: Realizar el requerimiento 2
     pass
-
-
+def nuevo(cada):
+    fecha = datetime.datetime.strptime(cada["time"], "%Y-%m-%dT%H:%M:%S.%fZ")
+    dates = fecha.strftime('%Y-%m-%d %H:%M:%S')
+    dato= {"time":dates,"mag":cada["mag"],"lat":cada["lat"],"long":cada["long"],"depth":cada["depth"],"sig":cada["sig"],"gap":cada["gap"],
+           "nst":cada["nst"],"title":cada["title"],"cdi":cada["cdi"],"mmi":cada["mmi"],"magType":cada["magType"],"type": cada["type"],"code":cada["code"]}
+    return dato
 def req_3(data_structs):
     """
     Función que soluciona el requerimiento 3
@@ -271,7 +333,17 @@ def sort_criteria(data_1, data_2):
     """
     #TODO: Crear función comparadora para ordenar
     pass
-
+def compare_results_list(data1, data2):
+    fecha1= datetime.datetime.strptime(data1['time'], "%Y-%m-%dT%H:%M:%S.%fZ")
+    date_1 = fecha1.strftime('%Y-%m-%d %H:%M:%S')
+    fecha2= datetime.datetime.strptime(data2['time'], "%Y-%m-%dT%H:%M:%S.%fZ")
+    date_2 = fecha2.strftime('%Y-%m-%d %H:%M:%S')
+    if date_1>date_2:
+        return 1
+    elif date_1==date_2:
+        return 0
+    else :
+        return -1
 
 def sort(data_structs):
     """
