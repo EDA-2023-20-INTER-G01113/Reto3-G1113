@@ -160,10 +160,10 @@ def get_data_3(data_structs,tamano):
     #TODO: Crear la función para obtener un dato de una lista   
     resultados = lt.newList("ARRAY_LIST")
     lt.addFirst(resultados,lt.firstElement(data_structs))
-    for b in range(2,4):
+    for b in range(2,6):
         p = lt.getElement(data_structs, b)
         lt.addLast(resultados, p)
-    for b in range (0,3):
+    for b in range (0,5):
         p = lt.getElement(data_structs, (tamano-2+b))
         lt.addLast(resultados, p)
     return resultados
