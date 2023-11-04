@@ -164,7 +164,7 @@ def get_data_3(data_structs,tamano):
         p = lt.getElement(data_structs, b)
         lt.addLast(resultados, p)
     for b in range (0,5):
-        p = lt.getElement(data_structs, (tamano-2+b))
+        p = lt.getElement(data_structs, (tamano-4+b))
         lt.addLast(resultados, p)
     return resultados
 
