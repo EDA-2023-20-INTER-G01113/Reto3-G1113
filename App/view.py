@@ -71,9 +71,10 @@ def load_data(control,data_size):
     """
     Carga los datos
     """
-    control= controller.load_data(control,data_size)
+    control,tamaño, lista= controller.load_data(control,data_size)
     #print(control)
-    print(controller.size(control['lista_temblores']))
+    print("Total de temblores "+str(tamaño))
+    print(lista)
     #TODO: Realizar la carga de datos
     pass
 
@@ -163,7 +164,16 @@ if __name__ == "__main__":
         print_menu()
         inputs = input('Seleccione una opción para continuar\n')
         if int(inputs) == 1:
-            data= int(input("Ingrese el numeri "))
+            message = """
+Ingrese 1 si quiere cargar una muestra pequeña de los datos. 
+Ingrese 2 si quiere cargar el 5 porciento de los datos.
+Ingrese 3 si quiere cargar el 10 porciento de los datos.
+Ingrese 4 si quiere cargar el 20 porciento de los datos
+Ingrese 5 si quiere cargar el 30 porciento de los datos.
+Ingrese 6 si quiere cargar el 50 porciento de los datos
+Ingrese 7 si quiere cargar el 80 porciento de los datos
+Ingrese 8 si quiere cargar TODOS los datos."""
+            data = int(input(message))
             print("Cargando información de los archivos ....\n")
             load_data(control,data)
         elif int(inputs) == 2:

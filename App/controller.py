@@ -55,7 +55,9 @@ def load_data(control, data_size):
     input_file = csv.DictReader(open(file_name, encoding='utf-8'))
     for temblor in input_file:
         model.add_data_ms(control, temblor)
-    return control
+    tamaño= size(control['lista_temblores'])
+    lista= model.get_data_3(control["lista_temblores"],tamaño)
+    return control,tamaño,lista
 
 
 def load(data_size):
@@ -96,6 +98,7 @@ def get_data(control, id):
     """
     Retorna un dato por su ID.
     """
+
     #TODO: Llamar la función del modelo para obtener un dato
     pass
 

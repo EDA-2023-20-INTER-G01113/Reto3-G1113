@@ -153,11 +153,40 @@ def compare_elements(keyname, element):
         return -1
 
 # Funciones de consulta
+def get_data_3(data_structs,tamano):
+    """
+    Retorna un dato a partir de su ID
+    """
+    #TODO: Crear la función para obtener un dato de una lista   
+    resultados = lt.newList("ARRAY_LIST")
+    lt.addFirst(resultados,lt.firstElement(data_structs))
+    for b in range(2,4):
+        p = lt.getElement(data_structs, b)
+        lt.addLast(resultados, p)
+    for b in range (0,3):
+        p = lt.getElement(data_structs, (tamano-2+b))
+        lt.addLast(resultados, p)
+    return resultados
 
 def get_data(data_structs, id):
     """
     Retorna un dato a partir de su ID
     """
+    total=0
+    lista = lt.newList("ARRAY_LIST")
+
+    #Cinco primeros
+    for key in om.keySet(data_structs):
+        k_v = om.get(data_structs, key)
+        value = me.getValue(k_v)
+        for data in value:
+            lt.addLast(lista, data)
+            total+=1
+            if total>5:
+                break
+
+    if total >0:
+        valor=om.select(data_structs,0)
     #TODO: Crear la función para obtener un dato de una lista
     pass
 
