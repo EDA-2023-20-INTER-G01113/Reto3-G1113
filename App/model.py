@@ -103,6 +103,7 @@ def updateDate(mapa, data):
         datentry = me.getValue(entry)
     add_data(datentry, data)
     return mapa
+
 def uptime(mapa,data):
     occurreddate = data['time']
     fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
