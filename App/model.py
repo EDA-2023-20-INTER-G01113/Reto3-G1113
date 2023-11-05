@@ -39,10 +39,16 @@ from DISClib.Algorithms.Sorting import insertionsort as ins
 from DISClib.Algorithms.Sorting import selectionsort as se
 from DISClib.Algorithms.Sorting import mergesort as merg
 from DISClib.Algorithms.Sorting import quicksort as quk
+import folium
+from folium.plugins import MarkerCluster
 import datetime
 import math
+import os
 from datetime import date
 assert cf
+
+MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
@@ -459,13 +465,155 @@ def req_7(data_structs):
     pass
 
 
-def req_8(data_structs):
+def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
     """
     Función que soluciona el requerimiento 8
     """
     # TODO: Realizar el requerimiento 8
-    pass
+    if req=='0':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req0.html'
+            for result in lt.iterator(data_structs['lista_temblores']):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip=result['title'],
+                            popup=mssg).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req0.html'
+            for result in lt.iterator(data_structs['lista_temblores']):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip=result['title'],
+                            popup=mssg).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
 
+    elif req=='2':
+        pass
+        """ try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req2.html'
+            for mag in lt.iterator(list_result):
+                for result in lt.iterator(mag['Details']):
+                    mssg=''
+                    for key in result:
+                        mssg += f'{key}: {result[key]}\n'
+                    folium.Marker(location=[float(result['lat']),float(result['long'])],
+                                tooltip=result['title'],
+                                popup=mssg).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req2.html'
+            for mag in lt.iterator(list_result):
+                for result in lt.iterator(mag['Details']):
+                    mssg=''
+                    for key in result:
+                        mssg += f'{key}: {result[key]}\n'
+                    folium.Marker(location=[float(result['lat']),float(result['long'])],
+                                tooltip=result['title'],
+                                popup=mssg).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}') """
+    
+    elif req=='4':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req4.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip=result['title'],
+                            popup=mssg).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req4.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip=result['title'],
+                            popup=mssg).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+
+    elif req=='6':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr= MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req6.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip=result['title'],
+                            popup=mssg).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            circle = folium.Circle(location=[lat, long],
+                                radius=radius*1000,
+                                color='orange',
+                                fill=True,
+                                fill_color='orange',
+                                fill_opacity=0.2)
+            circle.add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print(f'An error occured. Check your internet connection \n')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req6.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip=result['title'],
+                            popup=mssg).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            circle = folium.Circle(location=[lat, long],
+                                radius=radius*1000,
+                                color='orange',
+                                fill=True,
+                                fill_color='orange',
+                                fill_opacity=0.2)
+            circle.add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 

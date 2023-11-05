@@ -129,10 +129,8 @@ def print_req_4(control):
         Función que imprime la solución del Requerimiento 4 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 4
-    min_sig = float(input("Ingrese la significancia mínima del evento: "))
-    max_gap = float(input("Ingrese la distancia azimutal máxima del evento: "))
 
-    results, length, dates = controller.req_4(control, min_sig, max_gap)
+    results, length, dates, _ = controller.req_4(control)
     
     elems = [x for x in lt.iterator(results)]
 
@@ -157,19 +155,7 @@ def print_req_6(control):
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    f_year = int(input("Ingrese el año sobre el cual quiere recibir información: "))
-    lat = float(input("Ingrese la latitud de referencia: "))
-    long = float(input("Ingrese la longitud de referencia: "))
-    radius = float(input("Ingrese el radio sobre el cual quiere recibir eventos: "))
-    n_events = int(input("Ingrese el número de eventos: ")) 
-
-    """ f_year = 2022
-    lat = 4.674
-    long = -74.068
-    radius = 3000.0
-    n_events = 5
- """
-    results, post_events, pre_events, total_events, total_dates, code, event, radius_events = controller.req_6(control, lat, long, radius, n_events, f_year)
+    results, post_events, pre_events, total_events, total_dates, code, event, radius_events, _, _, _, _= controller.req_6(control)
     elems = [x for x in lt.iterator(results)]
 
     print(f'Max event code: {code}')
@@ -208,8 +194,7 @@ def print_req_8(control):
         Función que imprime la solución del Requerimiento 8 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 8
-    pass
-
+    controller.req_8(control)
 
 # Se crea el controlador asociado a la vista
 control = new_controller()
