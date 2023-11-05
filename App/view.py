@@ -144,9 +144,42 @@ def print_req_6(control):
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    f_year = int(input("Ingrese el año sobre el cual quiere recibir información: "))
+    lat = float(input("Ingrese la latitud de referencia: "))
+    long = float(input("Ingrese la longitud de referencia: "))
+    radius = float(input("Ingrese el radio sobre el cual quiere recibir eventos: "))
+    n_events = int(input("Ingrese el número de eventos: ")) 
 
+    """ f_year = 2022
+    lat = 4.674
+    long = -74.068
+    radius = 3000.0
+    n_events = 5
+ """
+    results, post_events, pre_events, total_events, total_dates, code, event, radius_events = controller.req_6(control, lat, long, radius, n_events, f_year)
+    elems = [x for x in lt.iterator(results)]
 
+    print(f'Max event code: {code}')
+    print(f'Post n events: {post_events}')
+    print(f'Pre n events: {pre_events}')
+    print(f'\n')
+    
+    print(f'Number of events within radius: {radius_events}')
+    print(f'Total different dates: {total_dates}')
+    print(f'Total events between dates: {total_events}')
+    print(f'\n')
+
+    print(f'{"-"*5} Max Event {"-"*5}')
+    print(f'{tabulate([event],headers="keys",tablefmt="grid")}')
+    print(f'\n')
+
+    print(f'{"-"*5} Nearest Events in chronological order{"-"*5}')
+    print(f'Most important events related to the max event: {code}')
+    print(f'\n')
+
+    print(f'Consult size: {total_events}. Only first and last 3 results are:')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
 def print_req_7(control):
     """
         Función que imprime la solución del Requerimiento 7 en consola

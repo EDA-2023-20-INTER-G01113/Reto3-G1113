@@ -151,13 +151,16 @@ def req_5(control):
     # TODO: Modificar el requerimiento 5
     pass
 
-def req_6(control):
+def req_6(control, lat, long, radius, n_events, f_year):
     """
     Retorna el resultado del requerimiento 6
     """
     # TODO: Modificar el requerimiento 6
-    pass
-
+    results, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events = model.req_6(control, lat, long, radius, n_events, f_year)
+    r_size = lt.size(results)
+    if r_size>6:
+        return model.get_data_3(results,r_size), post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events
+    return results, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events
 
 def req_7(control):
     """
