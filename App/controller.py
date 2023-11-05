@@ -26,8 +26,14 @@ import time
 import csv
 csv.field_size_limit(2147483647)
 import tracemalloc
+import folium
+from folium.plugins import MarkerCluster
+import os
+from tabulate import tabulate
 from DISClib.ADT import list as lt
 
+MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
 """
 El controlador se encarga de mediar entre la vista y el modelo.
 """
@@ -56,6 +62,37 @@ def load_data(control, data_size):
     input_file = csv.DictReader(open(file_name, encoding='utf-8'))
     for temblor in input_file:
         model.add_data_ms(control, temblor)
+    try:
+        m= folium.Map(tiles=MAP_TILE, 
+                    attr=MAP_ATTRIBUTES)
+        mCluster = MarkerCluster(name="Cluster").add_to(m)
+        path = r'.\Data\maps\req0.html'
+        for result in lt.iterator(control['lista_temblores']):
+            mssg=''
+            for key in result:
+                mssg += f'{key}: {result[key]}\n'
+            folium.Marker(location=[float(result['lat']),float(result['long'])],
+                        tooltip=result['title'],
+                        popup=mssg).add_to(mCluster)
+        folium.LayerControl().add_to(m)
+        m.save(path)
+        os.system(f'start {path}')
+    except Exception as e:
+        print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+        m= folium.Map()
+        mCluster = MarkerCluster(name="Cluster").add_to(m)
+        path = r'.\Data\maps\req0.html'
+        for result in lt.iterator(control['lista_temblores']):
+            mssg=''
+            for key in result:
+                mssg += f'{key}: {result[key]}\n'
+            folium.Marker(location=[float(result['lat']),float(result['long'])],
+                        tooltip=result['title'],
+                        popup=mssg).add_to(mCluster)
+        folium.LayerControl().add_to(m)
+        m.save(path)
+        os.system(f'start {path}')
+
     tamaño= size(control['lista_temblores'])
     lista= model.get_data_5(control["lista_temblores"],tamaño)
     return control,tamaño,lista
@@ -117,12 +154,45 @@ def req_2(control,im,fm):
     Retorna el resultado del requerimiento 2
     """
     resultado,total = model.req_2(control,im,fm)
+
+    try:
+        m= folium.Map(tiles=MAP_TILE, 
+                    attr=MAP_ATTRIBUTES)
+        mCluster = MarkerCluster(name="Cluster").add_to(m)
+        path = r'.\Data\maps\req2.html'
+        for mag in lt.iterator(resultado):
+            for result in lt.iterator(mag['Details']):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip=result['title'],
+                            popup=mssg).add_to(mCluster)
+        folium.LayerControl().add_to(m)
+        m.save(path)
+        os.system(f'start {path}')
+    except Exception as e:
+        print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+        m= folium.Map()
+        mCluster = MarkerCluster(name="Cluster").add_to(m)
+        path = r'.\Data\maps\req2.html'
+        for mag in lt.iterator(resultado):
+            for result in lt.iterator(mag['Details']):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip=result['title'],
+                            popup=mssg).add_to(mCluster)
+        folium.LayerControl().add_to(m)
+        m.save(path)
+        os.system(f'start {path}') 
+
     tamano= size(resultado)
     if tamano>6:
         return model.get_data_3(resultado,tamano),total
     return resultado,total
     # TODO: Modificar el requerimiento 2
-    pass
 
 
 def req_3(control):
@@ -139,6 +209,37 @@ def req_4(control, min_sig, max_gap):
     """
     # TODO: Modificar el requerimiento 4
     results, leng, dates = model.req_4(control, min_sig, max_gap)
+    try:
+        m= folium.Map(tiles=MAP_TILE, 
+                    attr=MAP_ATTRIBUTES)
+        mCluster = MarkerCluster(name="Cluster").add_to(m)
+        path = r'.\Data\maps\req4.html'
+        for result in lt.iterator(results):
+            mssg=''
+            for key in result:
+                mssg += f'{key}: {result[key]}\n'
+            folium.Marker(location=[float(result['lat']),float(result['long'])],
+                        tooltip=result['title'],
+                        popup=mssg).add_to(mCluster)
+        folium.LayerControl().add_to(m)
+        m.save(path)
+        os.system(f'start {path}')
+    except Exception as e:
+        print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+        m= folium.Map()
+        mCluster = MarkerCluster(name="Cluster").add_to(m)
+        path = r'.\Data\maps\req4.html'
+        for result in lt.iterator(results):
+            mssg=''
+            for key in result:
+                mssg += f'{key}: {result[key]}\n'
+            folium.Marker(location=[float(result['lat']),float(result['long'])],
+                        tooltip=result['title'],
+                        popup=mssg).add_to(mCluster)
+        folium.LayerControl().add_to(m)
+        m.save(path)
+        os.system(f'start {path}')
+
     r_size = lt.size(results)
     if r_size>6:
         return model.get_data_3(results,r_size),leng, dates
@@ -157,6 +258,52 @@ def req_6(control, lat, long, radius, n_events, f_year):
     """
     # TODO: Modificar el requerimiento 6
     results, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events = model.req_6(control, lat, long, radius, n_events, f_year)
+    
+    try:
+        m= folium.Map(tiles=MAP_TILE, 
+                    attr= MAP_ATTRIBUTES)
+        mCluster = MarkerCluster(name="Cluster").add_to(m)
+        path = r'.\Data\maps\req6.html'
+        for result in lt.iterator(results):
+            mssg=''
+            for key in result:
+                mssg += f'{key}: {result[key]}\n'
+            folium.Marker(location=[float(result['lat']),float(result['long'])],
+                        tooltip=result['title'],
+                        popup=mssg).add_to(mCluster)
+        folium.LayerControl().add_to(m)
+        circle = folium.Circle(location=[lat, long],
+                               radius=radius*1000,
+                               color='orange',
+                               fill=True,
+                               fill_color='orange',
+                               fill_opacity=0.2)
+        circle.add_to(m)
+        m.save(path)
+        os.system(f'start {path}')
+    except Exception as e:
+        print(f'An error occured. Check your internet connection \n')
+        m= folium.Map()
+        mCluster = MarkerCluster(name="Cluster").add_to(m)
+        path = r'.\Data\maps\req6.html'
+        for result in lt.iterator(results):
+            mssg=''
+            for key in result:
+                mssg += f'{key}: {result[key]}\n'
+            folium.Marker(location=[float(result['lat']),float(result['long'])],
+                        tooltip=result['title'],
+                        popup=mssg).add_to(mCluster)
+        folium.LayerControl().add_to(m)
+        circle = folium.Circle(location=[lat, long],
+                               radius=radius*1000,
+                               color='orange',
+                               fill=True,
+                               fill_color='orange',
+                               fill_opacity=0.2)
+        circle.add_to(m)
+        m.save(path)
+        os.system(f'start {path}')
+
     r_size = lt.size(results)
     if r_size>6:
         return model.get_data_3(results,r_size), post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events

@@ -74,9 +74,12 @@ def load_data(control,data_size):
     control,tamaño, lista= controller.load_data(control,data_size)
     #print(control)
     print("Total de temblores "+str(tamaño))
-    print(lista)
     #TODO: Realizar la carga de datos
-    pass
+    elems = [x for x in lt.iterator(lista)]
+    print(f'\n')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
+    print(r'Open \Data\maps\req0.html on your browser to see an interactive map with your results!')
 
 
 def print_data(control, id):
@@ -100,9 +103,17 @@ def print_req_2(control,im,fm):
     """
     res,tamano=controller.req_2(control,im,fm)
     print("El total de resultado es de : "+ str(tamano))
-    print(res)
     # TODO: Imprimir el resultado del requerimiento 2
-    pass
+    for x in lt.iterator(res):
+        lista = []
+        for elem in lt.iterator(x['Details']):
+            lista.append(elem)
+        x['Details']=tabulate(lista,headers="keys",tablefmt="grid")
+    elems = [x for x in lt.iterator(res)]
+    print(f'\n')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
+    print(r'Open \Data\maps\req2.html on your browser to see an interactive map with your results!')
 
 
 def print_req_3(control):
@@ -129,6 +140,8 @@ def print_req_4(control):
     print(f'Total events between dates {length}')
     print(f'\n')
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
+    print(r'Open \Data\maps\req4.html on your browser to see an interactive map with your results!')
 
 
 def print_req_5(control):
@@ -180,6 +193,8 @@ def print_req_6(control):
     print(f'Consult size: {total_events}. Only first and last 3 results are:')
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
+    print(f'\n')
+    print(r'Open \Data\maps\req6.html on your browser to see an interactive map with your results!')
 def print_req_7(control):
     """
         Función que imprime la solución del Requerimiento 7 en consola
