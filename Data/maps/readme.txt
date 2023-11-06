@@ -1,0 +1,1 @@
+Please do not delete this folder! This will store all the generated maps.

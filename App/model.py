@@ -39,9 +39,20 @@ from DISClib.Algorithms.Sorting import insertionsort as ins
 from DISClib.Algorithms.Sorting import selectionsort as se
 from DISClib.Algorithms.Sorting import mergesort as merg
 from DISClib.Algorithms.Sorting import quicksort as quk
+import folium
+from folium import Popup
+from folium.plugins import MarkerCluster
+from folium import Tooltip
 import datetime
+import math
+import os
+import html
 from datetime import date
 assert cf
+
+MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+MAX_MAP_PROPS = 10000
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
@@ -67,6 +78,14 @@ def new_data_structs():
                                       cmpfunction=compareDates)
     #control["temblores_por_fecha"] = om.newMap(omaptype="RBT", 
     #                                           cmpfunction=compareDates)
+    
+    control['temblores_sig']= om.newMap(omaptype='RBT',
+                                        cmpfunction=compareFloats)
+    
+    control['temblores_gap']= om.newMap(omaptype='RBT',
+                                        cmpfunction=compareFloats)
+    
+    control['quakes_req6']= lt.newList('ARRAY_LIST', compare)
     return control  
 
 
@@ -81,9 +100,19 @@ def add_data_ms(control, data):
     uptime(control["temblores"],data)
     #uptime(control["temblores_por_fecha"],data)
 
+    up_significance(control, data)
+    up_gap(control, data)
+    up_req6(control, data)
     return control
     #TODO: Crear la función para agregar elementos a una lista
     
+
+def up_req6(data_structs, data):
+    info = nuevo(data)
+    fecha = datetime.datetime.strptime(info["time"], '%Y-%m-%d %H:%M:%S')
+    info['time']=fecha
+    lt.addLast(data_structs['quakes_req6'], info)
+
 def updateDate(mapa, data):
     mag = round(float(data['mag']),3)
     entry = om.get(mapa, mag)
@@ -109,6 +138,35 @@ def uptime(mapa,data):
     add_data_ms(datentry,data)
     lt.addLast(datentry["time"],data)
     return mapa
+
+def up_significance(data_structs, data):
+    mapa = data_structs['temblores_sig']
+    info = nuevo(data)
+    if not info['sig']:
+        info['sig']=0
+    sig = info['sig']
+    entry = om.get(mapa, sig)
+    if entry is None:
+        dataentry = lt.newList("ARRAY_LIST",cmpfunction=cmp_quakes)
+    else:
+        dataentry = me.getValue(entry)
+    lt.addLast(dataentry, info)
+    om.put(mapa, sig, dataentry)
+
+def up_gap(data_structs, data):
+    mapa = data_structs['temblores_gap']
+    info = nuevo(data)
+    if not info['gap']:
+        info['gap']=0
+    gap= round(float(info['gap']),3)
+    entry = om.get(mapa, gap)
+    if entry is None:
+        dataentry = lt.newList("ARRAY_LIST",cmpfunction=cmp_quakes)
+    else:
+        dataentry = me.getValue(entry)
+    lt.addLast(dataentry, info)
+    om.put(mapa, gap, dataentry)
+
 # Funciones para creacion de datos
 
 def new_data():
@@ -271,7 +329,7 @@ def req_2(analyzer,initialmag, finalmag ):
         lt.addFirst(lista,diccionario)
     return lista,total
     # TODO: Realizar el requerimiento 2
-    pass
+    
 def nuevo(cada):
     fecha = datetime.datetime.strptime(cada["time"], "%Y-%m-%dT%H:%M:%S.%fZ")
     dates = fecha.strftime('%Y-%m-%d %H:%M:%S')
@@ -286,12 +344,51 @@ def req_3(data_structs):
     pass
 
 
-def req_4(data_structs):
+def req_4(data_structs, min_sig, max_gap):
     """
     Función que soluciona el requerimiento 4
     """
     # TODO: Realizar el requerimiento 4
-    pass
+    sig_om = data_structs['temblores_sig']
+    gap_om = data_structs['temblores_gap']
+
+    results = lt.newList("ARRAY_LIST", cmpfunction=cmp_quakes)
+
+    max_sig = om.maxKey(sig_om)
+    sig_keys = om.keys(sig_om, min_sig, max_sig)
+    min_gap = om.minKey(gap_om)
+    gap_keys = om.keys(gap_om, min_gap, max_gap)
+
+    entries_map = mp.newMap(lt.size(sig_keys)*2.1, 
+                            maptype="PROBING", 
+                            loadfactor=0.5,
+                            cmpfunction=compare_elements)
+
+    dates_map = mp.newMap(lt.size(sig_keys), 
+                            maptype="PROBING", 
+                            loadfactor=0.5,
+                            cmpfunction=compare_elements)
+    for key in lt.iterator(sig_keys):
+        quakes_list = me.getValue(om.get(sig_om,key))
+        for quake in lt.iterator(quakes_list):
+            mp.put(entries_map, quake['code'], quake)
+    
+    for key in lt.iterator(gap_keys):
+        quakes_list = me.getValue(om.get(gap_om, key))
+        for quake in lt.iterator(quakes_list):
+            if mp.contains(entries_map, quake['code']):
+                lt.addLast(results, quake)
+                if not mp.contains(dates_map, quake['time']):
+                    mp.put(dates_map, quake['time'],1)
+
+    merg.sort(results, req4_sort_criteria)
+    size = lt.size(results)
+    dates = mp.size(dates_map)
+
+    return_list = results
+    
+    return return_list, size, dates
+
 
 
 def req_5(data_structs):
@@ -302,13 +399,100 @@ def req_5(data_structs):
     pass
 
 
-def req_6(data_structs):
+def req_6(data_structs,lat, long, radius, n_events, f_year):
     """
     Función que soluciona el requerimiento 6
     """
     # TODO: Realizar el requerimiento 6
-    pass
+    all_q = data_structs['quakes_req6']
+    area_q = lt.newList("ARRAY_LIST")
 
+    most_sig= 0
+    sig_event = None
+    post_events = 0
+    pre_events = 0
+
+    delta_ti = mp.newMap(lt.size(area_q)*2.1,
+                        maptype="PROBING", 
+                        loadfactor=0.5,
+                        cmpfunction=compare_elements)
+
+    return_list = lt.newList("ARRAY_LIST")
+
+    for quake in lt.iterator(all_q):
+        if quake['time'].year == f_year:
+            dist = harvesine_formula(lat,long,quake)
+            if dist<=radius:
+                if not quake['sig']:
+                    quake['sig']=0
+                lt.addLast(area_q, quake)
+                if float(quake['sig'])>float(most_sig):
+                    most_sig = quake['sig']
+                    sig_event = quake
+    sig_code = sig_event['code']
+
+    for quake in lt.iterator(area_q):
+        diff_t = (sig_event['time']-quake['time']).total_seconds()
+        mp.put(delta_ti, diff_t,quake)
+    
+    times_list = lt.newList('ARRAY_LIST')
+    for t in lt.iterator(mp.keySet(delta_ti)):
+        lt.addLast(times_list,t)
+    
+    merg.sort(times_list, req6_sort_criteria)
+
+    dates_map = mp.newMap(n_events*4.1, 
+                            maptype="PROBING", 
+                            loadfactor=0.5,
+                            cmpfunction=compare_elements)
+
+    
+    for key in lt.iterator(times_list):
+        event = me.getValue(mp.get(delta_ti, key))
+        if key<0 and pre_events<n_events:
+            lt.addLast(return_list, event)
+            pre_events+=1
+            if not mp.contains(dates_map, event['time']):
+                    mp.put(dates_map, event['time'],1)
+        elif key>0 and post_events<n_events:
+            lt.addLast(return_list, event)
+            post_events+=1
+            if not mp.contains(dates_map, event['time']):
+                    mp.put(dates_map, event['time'],1)
+    lt.addLast(return_list, sig_event)
+    if not mp.contains(dates_map, sig_event['time']):
+                    mp.put(dates_map, sig_event['time'],1)
+                    
+    merg.sort(return_list, req6_sort_criteria2)
+    total_events = lt.size(return_list)
+    total_dates = mp.size(dates_map)
+    radius_events = lt.size(area_q)
+
+    return return_list, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events
+
+def harvesine_formula(lat1, long1, data):
+    #Defines the distance between a given point and a seismic event as defined by the Harvesine formula.
+    
+    # Radius of the Earth in kilometers
+    R = 6371.0
+
+    # Convert latitude and longitude from degrees to radians
+    lat1 = math.radians(lat1)
+    long1 = math.radians(long1)
+    lat2 = math.radians(float(data['lat']))
+    long2 = math.radians(float(data['long']))
+
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlong = long2 - long1
+
+    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlong / 2)**2
+    c = 2 * math.asin(math.sqrt(a))
+
+    # Calculate the distance
+    distance = R * c
+
+    return distance
 
 def req_7(data_structs):
     """
@@ -318,13 +502,174 @@ def req_7(data_structs):
     pass
 
 
-def req_8(data_structs):
+def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
     """
     Función que soluciona el requerimiento 8
     """
     # TODO: Realizar el requerimiento 8
-    pass
+    props = 0
+    if req=='0':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req0.html'
+            for result in lt.iterator(data_structs['lista_temblores']):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req0.html'
+            for result in lt.iterator(data_structs['lista_temblores']):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
 
+    elif req=='2':
+        pass
+        """ try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req2.html'
+            for mag in lt.iterator(list_result):
+                for result in lt.iterator(mag['Details']):
+                    mssg=''
+                    for key in result:
+                        mssg += f'{key}: {result[key]}\n'
+                    folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req2.html'
+            for mag in lt.iterator(list_result):
+                for result in lt.iterator(mag['Details']):
+                    mssg=''
+                    for key in result:
+                        mssg += f'{key}: {result[key]}\n'
+                    folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}') """
+    
+    elif req=='4':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req4.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req4.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+
+    elif req=='6':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr= MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req6.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            circle = folium.Circle(location=[lat, long],
+                                radius=radius*1000,
+                                color='orange',
+                                fill=True,
+                                fill_color='orange',
+                                fill_opacity=0.2)
+            circle.add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print(f'An error occured. Check your internet connection \n')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = r'.\Data\maps\req6.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            circle = folium.Circle(location=[lat, long],
+                                radius=radius*1000,
+                                color='orange',
+                                fill=True,
+                                fill_color='orange',
+                                fill_opacity=0.2)
+            circle.add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
@@ -338,6 +683,7 @@ def compare(data_1, data_2):
     elif data_1>data_2:
         return 1
     return -1
+
 def compareDates(date1, date2):
     """
     Compara dos fechas
@@ -349,6 +695,14 @@ def compareDates(date1, date2):
     else:
         return -1
 
+def compareFloats(data1, data2):
+
+    if (float(data1) == float(data2)):
+        return 0
+    elif (float(data1) > float(data2)):
+        return 1
+    else:
+        return -1
 # Funciones de ordenamiento
     
 
@@ -376,9 +730,35 @@ def compare_results_list(data1, data2):
     else :
         return -1
 
+def cmp_quakes(data1, data2):
+    if data1['code']==data2['code']:
+        return 0
+    elif data1['code']>data2['code']:
+        return 1
+    else:
+        return -1
+    
 def sort(data_structs):
     """
     Función encargada de ordenar la lista con los datos
     """
     #TODO: Crear función de ordenamiento
     pass
+
+def req4_sort_criteria(data1, data2):
+    date1=data1['time']
+    date2=data2['time']
+    if date1>date2:
+        return True
+    return False
+
+def req6_sort_criteria(data1, data2):
+    if abs(data1)<abs(data2):
+        return True
+    return False
+
+def req6_sort_criteria2(data1, data2):
+    if data1['time']<data2['time']:
+        return True
+    else:
+        return False

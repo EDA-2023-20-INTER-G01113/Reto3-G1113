@@ -74,9 +74,12 @@ def load_data(control,data_size):
     control,tamaño, lista= controller.load_data(control,data_size)
     #print(control)
     print("Total de temblores "+str(tamaño))
-    print(lista)
     #TODO: Realizar la carga de datos
-    pass
+    elems = [x for x in lt.iterator(lista)]
+    print(f'\n')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
+    print(r'Open \Data\maps\req0.html on your browser to see an interactive map with your results!')
 
 
 def print_data(control, id):
@@ -102,9 +105,17 @@ def print_req_2(control,im,fm):
     """
     res,tamano=controller.req_2(control,im,fm)
     print("El total de resultado es de : "+ str(tamano))
-    print(res)
     # TODO: Imprimir el resultado del requerimiento 2
-    pass
+    for x in lt.iterator(res):
+        lista = []
+        for elem in lt.iterator(x['Details']):
+            lista.append(elem)
+        x['Details']=tabulate(lista,headers="keys",tablefmt="grid")
+    elems = [x for x in lt.iterator(res)]
+    print(f'\n')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
+    print(r'Open \Data\maps\req2.html on your browser to see an interactive map with your results!')
 
 
 def print_req_3(control):
@@ -120,7 +131,17 @@ def print_req_4(control):
         Función que imprime la solución del Requerimiento 4 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 4
-    pass
+
+    results, length, dates, _ = controller.req_4(control)
+    
+    elems = [x for x in lt.iterator(results)]
+
+    print(f'Total different dates: {dates}')
+    print(f'Total events between dates {length}')
+    print(f'\n')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
+    print(r'Open \Data\maps\req4.html on your browser to see an interactive map with your results!')
 
 
 def print_req_5(control):
@@ -136,9 +157,32 @@ def print_req_6(control):
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    pass
+    results, post_events, pre_events, total_events, total_dates, code, event, radius_events, _, _, _, _= controller.req_6(control)
+    elems = [x for x in lt.iterator(results)]
 
+    print(f'Max event code: {code}')
+    print(f'Post n events: {post_events}')
+    print(f'Pre n events: {pre_events}')
+    print(f'\n')
+    
+    print(f'Number of events within radius: {radius_events}')
+    print(f'Total different dates: {total_dates}')
+    print(f'Total events between dates: {total_events}')
+    print(f'\n')
 
+    print(f'{"-"*5} Max Event {"-"*5}')
+    print(f'{tabulate([event],headers="keys",tablefmt="grid")}')
+    print(f'\n')
+
+    print(f'{"-"*5} Nearest Events in chronological order{"-"*5}')
+    print(f'Most important events related to the max event: {code}')
+    print(f'\n')
+
+    print(f'Consult size: {total_events}. Only first and last 3 results are:')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
+    print(f'\n')
+    print(r'Open \Data\maps\req6.html on your browser to see an interactive map with your results!')
 def print_req_7(control):
     """
         Función que imprime la solución del Requerimiento 7 en consola
@@ -152,8 +196,7 @@ def print_req_8(control):
         Función que imprime la solución del Requerimiento 8 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 8
-    pass
-
+    controller.req_8(control)
 
 # Se crea el controlador asociado a la vista
 control = new_controller()
