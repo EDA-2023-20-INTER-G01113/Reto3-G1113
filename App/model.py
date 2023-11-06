@@ -40,15 +40,19 @@ from DISClib.Algorithms.Sorting import selectionsort as se
 from DISClib.Algorithms.Sorting import mergesort as merg
 from DISClib.Algorithms.Sorting import quicksort as quk
 import folium
+from folium import Popup
 from folium.plugins import MarkerCluster
+from folium import Tooltip
 import datetime
 import math
 import os
+import html
 from datetime import date
 assert cf
 
 MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
 MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+MAX_MAP_PROPS = 10000
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
@@ -470,6 +474,7 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
     Función que soluciona el requerimiento 8
     """
     # TODO: Realizar el requerimiento 8
+    props = 0
     if req=='0':
         try:
             m= folium.Map(tiles=MAP_TILE, 
@@ -481,8 +486,11 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
                 for key in result:
                     mssg += f'{key}: {result[key]}\n'
                 folium.Marker(location=[float(result['lat']),float(result['long'])],
-                            tooltip=result['title'],
-                            popup=mssg).add_to(mCluster)
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
             folium.LayerControl().add_to(m)
             m.save(path)
             os.system(f'start {path}')
@@ -496,8 +504,11 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
                 for key in result:
                     mssg += f'{key}: {result[key]}\n'
                 folium.Marker(location=[float(result['lat']),float(result['long'])],
-                            tooltip=result['title'],
-                            popup=mssg).add_to(mCluster)
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
             folium.LayerControl().add_to(m)
             m.save(path)
             os.system(f'start {path}')
@@ -515,8 +526,8 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
                     for key in result:
                         mssg += f'{key}: {result[key]}\n'
                     folium.Marker(location=[float(result['lat']),float(result['long'])],
-                                tooltip=result['title'],
-                                popup=mssg).add_to(mCluster)
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
             folium.LayerControl().add_to(m)
             m.save(path)
             os.system(f'start {path}')
@@ -531,8 +542,8 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
                     for key in result:
                         mssg += f'{key}: {result[key]}\n'
                     folium.Marker(location=[float(result['lat']),float(result['long'])],
-                                tooltip=result['title'],
-                                popup=mssg).add_to(mCluster)
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
             folium.LayerControl().add_to(m)
             m.save(path)
             os.system(f'start {path}') """
@@ -548,8 +559,11 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
                 for key in result:
                     mssg += f'{key}: {result[key]}\n'
                 folium.Marker(location=[float(result['lat']),float(result['long'])],
-                            tooltip=result['title'],
-                            popup=mssg).add_to(mCluster)
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
             folium.LayerControl().add_to(m)
             m.save(path)
             os.system(f'start {path}')
@@ -563,8 +577,11 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
                 for key in result:
                     mssg += f'{key}: {result[key]}\n'
                 folium.Marker(location=[float(result['lat']),float(result['long'])],
-                            tooltip=result['title'],
-                            popup=mssg).add_to(mCluster)
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
             folium.LayerControl().add_to(m)
             m.save(path)
             os.system(f'start {path}')
@@ -580,8 +597,11 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
                 for key in result:
                     mssg += f'{key}: {result[key]}\n'
                 folium.Marker(location=[float(result['lat']),float(result['long'])],
-                            tooltip=result['title'],
-                            popup=mssg).add_to(mCluster)
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
             folium.LayerControl().add_to(m)
             circle = folium.Circle(location=[lat, long],
                                 radius=radius*1000,
@@ -602,8 +622,11 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
                 for key in result:
                     mssg += f'{key}: {result[key]}\n'
                 folium.Marker(location=[float(result['lat']),float(result['long'])],
-                            tooltip=result['title'],
-                            popup=mssg).add_to(mCluster)
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
             folium.LayerControl().add_to(m)
             circle = folium.Circle(location=[lat, long],
                                 radius=radius*1000,
