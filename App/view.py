@@ -94,7 +94,9 @@ def print_req_1(control,anio_inicio,anio_final):
     """
     # TODO: Imprimir el resultado del requerimiento 1
     respuesta,tamanio=controller.req_1(control, anio_inicio,anio_final)
+    print("Total de fechas diferentes: " + str(tamanio))
     print("El total de eventos sismicos en este rango de fecha es: " + str(tamanio))
+    print("Tamaño de consulta: " + str(tamanio) + " los primeros y ultimos tres resultados son: ")
     print(respuesta)
 
 

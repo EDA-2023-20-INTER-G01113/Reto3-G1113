@@ -115,6 +115,7 @@ def req_1(control,anio_inicio,anio_final):
     # TODO: Modificar el requerimiento 1
     respuesta,total =model.req_1(control,anio_inicio,anio_final)
     tamanio = size(respuesta)
+    
     if tamanio>6:
         return model.get_data_3(respuesta,tamanio),total
     return respuesta,total
