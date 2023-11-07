@@ -97,7 +97,7 @@ def add_data_ms(control, data):
     """
     lt.addLast(control['lista_temblores'], data)
     updateDate(control["temblores_mag"],data)
-    updateDate(control["temblores"],data)
+    uptime(control["temblores"],data)
     #uptime(control["temblores_por_fecha"],data)
 
     up_significance(control, data)
@@ -128,14 +128,14 @@ def updateDate(mapa, data):
 def uptime(mapa,data):
     occurreddate = data['time']
     fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
-    dates = fecha.strftime('%Y-%m-%dT%H:%M')
-    entry = om.get(mapa, dates)
+    #dates = fecha.strftime('%Y-%m-%dT%H:%M')
+    entry = om.get(mapa, fecha)
     if entry is None:
-        datentry = lt.newList("ARRAY_LIST")
-        om.put(mapa, dates, datentry)
+        datentry = new_data()
+        om.put(mapa, fecha, datentry)
     else:
         datentry = me.getValue(entry)
-    #add_data(datentry,data)
+    add_data_by_date(datentry,data)
     lt.addLast(datentry["By_time"],data)
     return mapa
 
@@ -180,6 +180,8 @@ def new_data():
     
     data["By_time"] = lt.newList("ARRAY_LIST")
     #lt.addLast(data["By_time"], data) #cambio
+    data["By_date"] = om.newMap(omaptype="BST",
+                                cmpfunction=compareDates)
     return data
 
 def add_data(structs,data):
@@ -193,20 +195,22 @@ def add_data(structs,data):
     lt.addLast(lista,data)
     return structs
 
-#def add_data_by_date(structs,data):
-    mapa= structs["By_time"]
-    occurreddate = data['time']
-    fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
-    dates = fecha.strftime('%Y-%m-%dT%H:%M')
-    entry = om.get(mapa, dates["time"])
+def add_data_by_date(structs,data):
+    mapa= structs["By_date"]
+    entry = om.get(mapa, data["time"])
+    #occurreddate = data['time']
+    #fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
+    #dates = fecha.strftime('%Y-%m-%dT%H:%M')
+    #entry = om.get(mapa, data["time"])
     if entry is None:
         datentry = lt.newList("ARRAY_LIST")
-        om.put(mapa, dates, datentry)
+        om.put(mapa,data["time"], datentry)
+    
     else:
         datentry = me.getValue(entry)
-        om.put(mapa,data["time"],datentry)
+        #om.put(mapa,data["time"],datentry)
     lt.addLast(datentry,data)
-    return mapa
+    return structs
 
 
     #TODO: Crear la función para estructurar los datos
@@ -274,14 +278,16 @@ def req_1(control, fecha_inicio, fecha_final):
     Función que soluciona el requerimiento 1
     """
     # TODO: Realizar el requerimiento 1
-    #fecha_in = datetime.datetime.strptime(fecha_inicio, "%Y-%m-%dT%H:%M:%S.%fZ")
+    fecha_in = datetime.datetime.strptime(fecha_inicio, '%Y-%m-%dT%H:%M')
     #date_1 = fecha_in.strftime('%Y-%m-%dT%H:%M')
     
-    #fecha_fin = datetime.datetime.strptime(fecha_final, "%Y-%m-%dT%H:%M:%S.%fZ")
+    fecha_fin = datetime.datetime.strptime(fecha_final, '%Y-%m-%dT%H:%M')
     #date_2 = fecha_fin.strftime('%Y-%m-%dT%H:%M')
+    #print("el tipo de entrada es")
+    #print(type(fecha_in))
     
-    lst_rango_fechas = om.keys(control["temblores"],fecha_inicio, fecha_final)
-    print(lst_rango_fechas)
+    lst_rango_fechas = om.keys(control["temblores"],fecha_in, fecha_fin)
+    #print(lst_rango_fechas)
     total = 0
     lista_final = lt.newList("SINGLE_LINKED")
     
@@ -298,17 +304,17 @@ def req_1(control, fecha_inicio, fecha_final):
             for ele in lt.iterator(orden):
                 d = nuevo(ele)
                 lt.addLast(info_adicional,d)
-            else:
-                for date in range(1,4):
-                    info = lt.getElement(orden,date)
-                    info = nuevo(info)
-                    lt.addLast(info_adicional,info)
-                for date in range(0,3): 
-                    info = lt.getElement(orden,date)
-                    info = lt.addLast(info_adicional,info)
-                    lt.addLast(info_adicional,info)
-            lt.addFirst(lista_final,info_adicional)
-        return lista_final, total
+        else:
+            for date in range(1,4):
+                info = lt.getElement(orden,date)
+                info = nuevo(info)
+                lt.addLast(info_adicional,info)
+            for date in range(0,3): 
+                info = lt.getElement(orden,date,(tamanio-2+date))
+                info = lt.addLast(info_adicional,info)
+                lt.addLast(info_adicional,info)
+        lt.addFirst(lista_final,info_adicional)
+    return lista_final, total
          
 def req_2(analyzer,initialmag, finalmag ):
     """
@@ -699,6 +705,8 @@ def compareDates(date1, date2):
     """
     Compara dos fechas
     """
+    print(date1)
+    print(date2)
     if (date1 == date2):
         return 0
     elif (date1 > date2):

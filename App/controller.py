@@ -61,6 +61,7 @@ def load_data(control, data_size):
 
     tamaño= size(control['lista_temblores'])
     lista= model.get_data_5(control["lista_temblores"],tamaño)
+
     return control,tamaño,lista
 
 
