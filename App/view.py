@@ -72,7 +72,6 @@ def load_data(control,data_size):
     Carga los datos
     """
     control,tamaño, lista= controller.load_data(control,data_size)
-    #print(control)
     print("Total de temblores "+str(tamaño))
     #TODO: Realizar la carga de datos
     elems = [x for x in lt.iterator(lista)]

@@ -279,15 +279,9 @@ def req_1(control, fecha_inicio, fecha_final):
     """
     # TODO: Realizar el requerimiento 1
     fecha_in = datetime.datetime.strptime(fecha_inicio, '%Y-%m-%dT%H:%M')
-    #date_1 = fecha_in.strftime('%Y-%m-%dT%H:%M')
-    
     fecha_fin = datetime.datetime.strptime(fecha_final, '%Y-%m-%dT%H:%M')
-    #date_2 = fecha_fin.strftime('%Y-%m-%dT%H:%M')
-    #print("el tipo de entrada es")
-    #print(type(fecha_in))
-    
     lst_rango_fechas = om.keys(control["temblores"],fecha_in, fecha_fin)
-    #print(lst_rango_fechas)
+    
     total = 0
     lista_final = lt.newList("SINGLE_LINKED")
     
@@ -705,8 +699,6 @@ def compareDates(date1, date2):
     """
     Compara dos fechas
     """
-    print(date1)
-    print(date2)
     if (date1 == date2):
         return 0
     elif (date1 > date2):
