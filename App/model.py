@@ -97,7 +97,7 @@ def add_data_ms(control, data):
     """
     lt.addLast(control['lista_temblores'], data)
     updateDate(control["temblores_mag"],data)
-    uptime(control["temblores"],data)
+    updateDate(control["temblores"],data)
     #uptime(control["temblores_por_fecha"],data)
 
     up_significance(control, data)
@@ -121,7 +121,7 @@ def updateDate(mapa, data):
         om.put(mapa,mag, datentry)
     else:
         datentry = me.getValue(entry)
-    add_data_ms(datentry, data)
+    add_data(datentry, data)
     lt.addLast(datentry["By_mag"],data)
     return mapa
 
@@ -135,8 +135,8 @@ def uptime(mapa,data):
         om.put(mapa, dates, datentry)
     else:
         datentry = me.getValue(entry)
-    add_data_ms(datentry,data)
-    lt.addLast(datentry["time"],data)
+    #add_data(datentry,data)
+    lt.addLast(datentry["By_time"],data)
     return mapa
 
 def up_significance(data_structs, data):
@@ -179,9 +179,10 @@ def new_data():
     data["By_mag"]= lt.newList("ARRAY_LIST")
     
     data["By_time"] = lt.newList("ARRAY_LIST")
+    #lt.addLast(data["By_time"], data) #cambio
     return data
 
-#def add_data(structs,data):
+def add_data(structs,data):
     mapa= structs["By_depth"]
     entry= om.get(mapa,data["depth"])
     if entry:
@@ -193,16 +194,17 @@ def new_data():
     return structs
 
 #def add_data_by_date(structs,data):
-    mapa= structs["By_date"]
+    mapa= structs["By_time"]
     occurreddate = data['time']
     fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
     dates = fecha.strftime('%Y-%m-%dT%H:%M')
-    entry = om.get(mapa, dates)
+    entry = om.get(mapa, dates["time"])
     if entry is None:
         datentry = lt.newList("ARRAY_LIST")
         om.put(mapa, dates, datentry)
     else:
         datentry = me.getValue(entry)
+        om.put(mapa,data["time"],datentry)
     lt.addLast(datentry,data)
     return mapa
 
@@ -267,15 +269,23 @@ def data_size(data_structs):
     pass
 
 
-def req_1(control, fecha_incio, fecha_final):
+def req_1(control, fecha_inicio, fecha_final):
     """
     Función que soluciona el requerimiento 1
     """
     # TODO: Realizar el requerimiento 1
-    lst = om.values(control["temblores"],fecha_incio, fecha_final)
+    #fecha_in = datetime.datetime.strptime(fecha_inicio, "%Y-%m-%dT%H:%M:%S.%fZ")
+    #date_1 = fecha_in.strftime('%Y-%m-%dT%H:%M')
+    
+    #fecha_fin = datetime.datetime.strptime(fecha_final, "%Y-%m-%dT%H:%M:%S.%fZ")
+    #date_2 = fecha_fin.strftime('%Y-%m-%dT%H:%M')
+    
+    lst_rango_fechas = om.keys(control["temblores"],fecha_inicio, fecha_final)
+    print(lst_rango_fechas)
     total = 0
-    lista_final = lt.newList("ARRAY_LIST")
-    for lst_fecha in lt.iterator(lst):
+    lista_final = lt.newList("SINGLE_LINKED")
+    
+    for lst_fecha in lt.iterator(lst_rango_fechas):
         respuesta = me.getValue(om.get(control["temblores"],lst_fecha))
         tamanio = lt.size(respuesta["By_time"])
         total += tamanio
@@ -283,6 +293,7 @@ def req_1(control, fecha_incio, fecha_final):
         info_adicional = dic["Adicional"]
         
         orden = merg.sort(respuesta["By_time"], compare_results_list)
+        
         if tamanio < 6:
             for ele in lt.iterator(orden):
                 d = nuevo(ele)
@@ -298,7 +309,7 @@ def req_1(control, fecha_incio, fecha_final):
                     lt.addLast(info_adicional,info)
             lt.addFirst(lista_final,info_adicional)
         return lista_final, total
-
+         
 def req_2(analyzer,initialmag, finalmag ):
     """
     Función que soluciona el requerimiento 2

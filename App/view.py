@@ -225,7 +225,9 @@ Ingrese 8 si quiere cargar TODOS los datos."""
             print("Cargando información de los archivos ....\n")
             load_data(control,data)
         elif int(inputs) == 2:
-            print_req_1(control)
+            anio_inicio = input("Año inicial: ")
+            anio_final = input("Año final: ")
+            print_req_1(control,anio_inicio, anio_final)
 
         elif int(inputs) == 3:
             im= float(input("INICIAL: "))
