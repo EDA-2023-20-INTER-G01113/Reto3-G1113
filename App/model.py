@@ -735,11 +735,9 @@ def compare_results_list(data1, data2):
     fecha2= datetime.datetime.strptime(data2['time'], "%Y-%m-%dT%H:%M:%S.%fZ")
     date_2 = fecha2.strftime('%Y-%m-%d %H:%M:%S')
     if date_1>date_2:
-        return 1
-    elif date_1==date_2:
-        return 0
+        return True
     else :
-        return -1
+        return False
 
 def cmp_quakes(data1, data2):
     if data1['code']==data2['code']:
