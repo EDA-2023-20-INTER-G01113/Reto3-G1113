@@ -72,7 +72,6 @@ def load_data(control,data_size):
     Carga los datos
     """
     control,tamaño, lista= controller.load_data(control,data_size)
-    #print(control)
     print("Total de temblores "+str(tamaño))
     #TODO: Realizar la carga de datos
     elems = [x for x in lt.iterator(lista)]
@@ -89,12 +88,16 @@ def print_data(control, id):
     #TODO: Realizar la función para imprimir un elemento
     pass
 
-def print_req_1(control):
+def print_req_1(control,anio_inicio,anio_final):
     """
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    pass
+    respuesta,tamanio=controller.req_1(control, anio_inicio,anio_final)
+    print("Total de fechas diferentes: " + str(tamanio))
+    print("El total de eventos sismicos en este rango de fecha es: " + str(tamanio))
+    print("Tamaño de consulta: " + str(tamanio) + " los primeros y ultimos 3 resultados son: ")
+    print(respuesta)
 
 
 def print_req_2(control,im,fm):
@@ -223,7 +226,9 @@ Ingrese 8 si quiere cargar TODOS los datos."""
             print("Cargando información de los archivos ....\n")
             load_data(control,data)
         elif int(inputs) == 2:
-            print_req_1(control)
+            anio_inicio = input("Año inicial: ")
+            anio_final = input("Año final: ")
+            print_req_1(control,anio_inicio, anio_final)
 
         elif int(inputs) == 3:
             im= float(input("INICIAL: "))
