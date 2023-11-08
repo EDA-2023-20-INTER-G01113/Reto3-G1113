@@ -76,8 +76,6 @@ def new_data_structs():
                                       cmpfunction=compareDates)
     control['temblores']= om.newMap(omaptype='BST',
                                       cmpfunction=compareDates)
-    #control["temblores_por_fecha"] = om.newMap(omaptype="RBT", 
-    #                                           cmpfunction=compareDates)
     
     control['temblores_sig']= om.newMap(omaptype='RBT',
                                         cmpfunction=compareFloats)
@@ -86,6 +84,10 @@ def new_data_structs():
                                         cmpfunction=compareFloats)
     
     control['quakes_req6']= lt.newList('ARRAY_LIST', compare)
+    
+    
+    control['temblores_depth'] = om.newMap(omaptype= 'BST', 
+                                           cmpfunction=compareFloats)
     return control  
 
 
@@ -98,7 +100,8 @@ def add_data_ms(control, data):
     lt.addLast(control['lista_temblores'], data)
     updateDate(control["temblores_mag"],data)
     uptime(control["temblores"],data)
-    #uptime(control["temblores_por_fecha"],data)
+    up_depth(control['temblores_depth'],data)
+
 
     up_significance(control, data)
     up_gap(control, data)
@@ -128,7 +131,7 @@ def updateDate(mapa, data):
 def uptime(mapa,data):
     occurreddate = data['time']
     fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
-    #dates = fecha.strftime('%Y-%m-%dT%H:%M')
+   
     entry = om.get(mapa, fecha)
     if entry is None:
         datentry = new_data()
@@ -167,6 +170,20 @@ def up_gap(data_structs, data):
     lt.addLast(dataentry, info)
     om.put(mapa, gap, dataentry)
 
+def up_depth(mapa, data):
+    depth = data['depth']
+    entry = om.get(mapa, depth)
+    
+    if entry is None:
+        depth_entry = new_data()
+        om.put(mapa,depth,depth_entry)
+    else:
+        depth_entry = me.getValue(entry)
+    add_data(depth_entry,data)
+    lt.addLast(depth_entry['By_depth_lst'],data)
+    return mapa
+    
+
 # Funciones para creacion de datos
 
 def new_data():
@@ -179,9 +196,11 @@ def new_data():
     data["By_mag"]= lt.newList("ARRAY_LIST")
     
     data["By_time"] = lt.newList("ARRAY_LIST")
-    #lt.addLast(data["By_time"], data) #cambio
+   
     data["By_date"] = om.newMap(omaptype="BST",
                                 cmpfunction=compareDates)
+    data["By_depth_lst"] = lt.newList('ARRAY_LIST')
+    
     return data
 
 def add_data(structs,data):
@@ -402,12 +421,12 @@ def req_4(data_structs, min_sig, max_gap):
 
 
 
-def req_5(data_structs):
+def req_5(data_structs, depth_min, min_estaciones_mon ):
     """
     Función que soluciona el requerimiento 5
     """
     # TODO: Realizar el requerimiento 5
-    pass
+    
 
 
 def req_6(data_structs,lat, long, radius, n_events, f_year):
