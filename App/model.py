@@ -52,7 +52,7 @@ assert cf
 
 MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
 MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-MAX_MAP_PROPS = 10000
+MAX_MAP_PROPS = 200000
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
