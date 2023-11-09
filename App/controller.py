@@ -154,12 +154,19 @@ def req_4(control):
         return model.get_data_3(results,r_size),leng, dates, results
     return results, leng, dates, results
 
-def req_5(control):
+def req_5(control,depth_min,min_estaciones_mon):
     """
     Retorna el resultado del requerimiento 5
     """
     # TODO: Modificar el requerimiento 5
-    pass
+    #depth_min = float(input("Ingrese el minimo de profundidad que desea consultar: "))
+    #min_estaciones_mon = int(input("Ingrese el numero minimo de estaciones de monitoreo que desea consultar: "))
+    
+    respuesta,total = model.req_5(control,depth_min, min_estaciones_mon)
+    tamanio = size(respuesta)
+    if tamanio>6:
+        return model.get_data_3(respuesta,tamanio),total
+    return respuesta,total
 
 def req_6(control):
     """

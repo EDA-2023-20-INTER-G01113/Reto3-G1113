@@ -421,11 +421,63 @@ def req_4(data_structs, min_sig, max_gap):
 
 
 
-def req_5(data_structs, depth_min, min_estaciones_mon ):
+def req_5(control, depth_min, min_estaciones_mon ):
     """
     Función que soluciona el requerimiento 5
     """
     # TODO: Realizar el requerimiento 5
+    key_max = om.maxKey(control["temblores_depth"])
+    #print(key_max) bien
+    lst_rango_depth = om.keys(control['temblores_depth'], depth_min, key_max)
+    #print(lst_rango_depth)
+    total = 0
+    lst_final = lt.newList("SINGLE_LINKED")
+    
+    for lst_depth in lt.iterator(lst_rango_depth):
+        valores_rango_depth = me.getValue(om.get(control['temblores_depth'],lst_depth))
+        #print(valores_rango_depth)
+        for cada in lt.iterator(valores_rango_depth['By_depth_lst']): 
+            #print(cada)
+            estaciones_mon = cada['nst']
+            if estaciones_mon == "":
+                estaciones_mon = 0
+            else:
+                estaciones_mon  = float(cada['nst'])
+                #print(estaciones_mon)             
+            if estaciones_mon >= min_estaciones_mon:
+                #rta = me.getValue(om.get(control['temblores_depth'], cada["depth"]))
+                #print(rta)
+                #tamanio = lt.size(rta['By_depth_lst'])
+                total += 1
+                lt.addLast(lst_final,cada)
+   
+    merg.sort(lst_final, compare_results_list)
+                #print(rta["By_depth_lst"])
+    
+    lista_final_1 =lt.newList("ARRAY_LIST")            
+   
+    if lt.size(lst_final) <= 20:
+        top_20 = lst_final
+    else:
+        top_20 = lt.subList(lst_final,1,20)
+    
+    if lt.size(top_20) < 6: 
+        for ele in lt.iterator(top_20):
+            d = nuevo(ele)
+            lt.addLast(lista_final_1,d)
+    else:
+        for dato in range(1,4):
+            info = lt.getElement(top_20,dato)
+            info = nuevo(info)
+            lt.addLast(lista_final_1,info)
+    
+        for data in range(0,3): 
+            info = lt.getElement(top_20,(lt.size(top_20)-2+data))
+            lt.addLast(lista_final_1,info)
+        
+    return lst_final, total
+             
+    
     
 
 
@@ -753,12 +805,10 @@ def compare_results_list(data1, data2):
     date_1 = fecha1.strftime('%Y-%m-%d %H:%M:%S')
     fecha2= datetime.datetime.strptime(data2['time'], "%Y-%m-%dT%H:%M:%S.%fZ")
     date_2 = fecha2.strftime('%Y-%m-%d %H:%M:%S')
-    if date_1>date_2:
-        return 1
-    elif date_1==date_2:
-        return 0
+    if fecha1>fecha2:
+        return True
     else :
-        return -1
+        return False
 
 def cmp_quakes(data1, data2):
     if data1['code']==data2['code']:

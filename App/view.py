@@ -145,12 +145,18 @@ def print_req_4(control):
     print(r'Open \Data\maps\req4.html on your browser to see an interactive map with your results!')
 
 
-def print_req_5(control):
+def print_req_5(control, depth_min, min_estaciones_mon):
     """
         Función que imprime la solución del Requerimiento 5 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 5
-    pass
+    
+    respuesta,tamanio=controller.req_5(control,depth_min,min_estaciones_mon)
+    print("Total de fechas diferentes: " + str(tamanio))
+    print("El total de eventos sismicos entre fechas: " + str(tamanio))
+    print("Seleccionando top 20")
+    print("Tamaño de la consulta: " + str(tamanio) + "los primeros y ultimos 3 del top 20: ")
+    print(respuesta)
 
 
 def print_req_6(control):
@@ -242,7 +248,9 @@ Ingrese 8 si quiere cargar TODOS los datos."""
             print_req_4(control)
 
         elif int(inputs) == 6:
-            print_req_5(control)
+            depth_min = float(input("Profundida  minima: "))
+            min_estaciones_mon = int(input("Cantidad minima de estaciones de monitoreo: "))
+            print_req_5(control, depth_min, min_estaciones_mon)
 
         elif int(inputs) == 7:
             print_req_6(control)
