@@ -453,14 +453,13 @@ def req_5(control, depth_min, min_estaciones_mon ):
    
     merg.sort(lst_final, compare_results_list)
                 #print(rta["By_depth_lst"])
-    
-    lista_final_1 =lt.newList("ARRAY_LIST")            
-   
+    #print("Lista lst", lst_final)
+    lista_final_1 =lt.newList("ARRAY_LIST")          
     if lt.size(lst_final) <= 20:
         top_20 = lst_final
     else:
         top_20 = lt.subList(lst_final,1,20)
-    
+    #print("Lista despuès de sublista",lt.subList(lst_final, 1,20))
     if lt.size(top_20) < 6: 
         for ele in lt.iterator(top_20):
             d = nuevo(ele)
@@ -468,14 +467,15 @@ def req_5(control, depth_min, min_estaciones_mon ):
     else:
         for dato in range(1,4):
             info = lt.getElement(top_20,dato)
-            info = nuevo(info)
+            #info = nuevo(info)
             lt.addLast(lista_final_1,info)
     
-        for data in range(0,3): 
-            info = lt.getElement(top_20,(lt.size(top_20)-2+data))
+        for i in range(lt.size(top_20) - 2, lt.size(top_20) + 1): 
+            #top_20,(lt.size(top_20)-2+data)
+            info = lt.getElement(top_20,i)
             lt.addLast(lista_final_1,info)
         
-    return lst_final, total
+    return lista_final_1, total
              
     
     
