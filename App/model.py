@@ -427,39 +427,33 @@ def req_5(control, depth_min, min_estaciones_mon ):
     """
     # TODO: Realizar el requerimiento 5
     key_max = om.maxKey(control["temblores_depth"])
-    #print(key_max) bien
     lst_rango_depth = om.keys(control['temblores_depth'], depth_min, key_max)
-    #print(lst_rango_depth)
     total = 0
     lst_final = lt.newList("SINGLE_LINKED")
     
     for lst_depth in lt.iterator(lst_rango_depth):
         valores_rango_depth = me.getValue(om.get(control['temblores_depth'],lst_depth))
-        #print(valores_rango_depth)
+       
         for cada in lt.iterator(valores_rango_depth['By_depth_lst']): 
-            #print(cada)
+           
             estaciones_mon = cada['nst']
             if estaciones_mon == "":
                 estaciones_mon = 0
             else:
                 estaciones_mon  = float(cada['nst'])
-                #print(estaciones_mon)             
+                        
             if estaciones_mon >= min_estaciones_mon:
-                #rta = me.getValue(om.get(control['temblores_depth'], cada["depth"]))
-                #print(rta)
-                #tamanio = lt.size(rta['By_depth_lst'])
                 total += 1
                 lt.addLast(lst_final,cada)
    
     merg.sort(lst_final, compare_results_list)
-                #print(rta["By_depth_lst"])
-    #print("Lista lst", lst_final)
+               
     lista_final_1 =lt.newList("ARRAY_LIST")          
     if lt.size(lst_final) <= 20:
         top_20 = lst_final
     else:
         top_20 = lt.subList(lst_final,1,20)
-    #print("Lista despuès de sublista",lt.subList(lst_final, 1,20))
+        
     if lt.size(top_20) < 6: 
         for ele in lt.iterator(top_20):
             d = nuevo(ele)
@@ -467,11 +461,9 @@ def req_5(control, depth_min, min_estaciones_mon ):
     else:
         for dato in range(1,4):
             info = lt.getElement(top_20,dato)
-            #info = nuevo(info)
             lt.addLast(lista_final_1,info)
     
         for i in range(lt.size(top_20) - 2, lt.size(top_20) + 1): 
-            #top_20,(lt.size(top_20)-2+data)
             info = lt.getElement(top_20,i)
             lt.addLast(lista_final_1,info)
         
