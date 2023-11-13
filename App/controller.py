@@ -128,6 +128,13 @@ def req_3(control):
     """
     Retorna el resultado del requerimiento 3
     """
+    profundidad=round(float(input("Ingrese la profundidad máxima: ")),3)
+    mag= round(float(input("Ingrese la magnitud mínima: ")),3)
+    resultado, cantidad = model.req_3(control,mag, profundidad)
+    if cantidad >6:
+        return model.get_data_3(resultado,10),cantidad
+    else:
+        return resultado, cantidad
     # TODO: Modificar el requerimiento 3
     pass
 
@@ -159,6 +166,7 @@ def req_7(control):
     """
     Retorna el resultado del requerimiento 7
     """
+    return model.req_7(control,"2020","Alaska", "mag")
     # TODO: Modificar el requerimiento 7
     pass
 

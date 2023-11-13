@@ -65,6 +65,8 @@ def new_data_structs():
                                       cmpfunction=compareDates)
     control['temblores']= om.newMap(omaptype='BST',
                                       cmpfunction=compareDates)
+    control["By_year"]=om.newMap(omaptype='BST',
+                                      cmpfunction=compareDates)
     return control  
 
 
@@ -77,6 +79,7 @@ def add_data_ms(control, data):
     lt.addLast(control['lista_temblores'], data)
     updateDate(control["temblores_mag"],data)
     uptime(control["temblores"],data)
+    agregar_req_7(control["By_year"],data)
 
     return control
     #TODO: Crear la función para agregar elementos a una lista
@@ -119,12 +122,12 @@ def new_data():
 
 def add_data(structs,data):
     mapa= structs["By_depth"]
-    entry= om.get(mapa,data["depth"])
+    entry= om.get(mapa,float(data["depth"]))
     if entry:
         lista= me.getValue(entry)
     else:
         lista= lt.newList("ARRAY_LIST")
-        om.put(mapa,data["depth"],lista)
+        om.put(mapa,float(data["depth"]),lista)
     lt.addLast(lista,data)
     return structs
 #def add_data_by_date(structs,data):
@@ -247,10 +250,50 @@ def nuevo(cada):
     dato= {"time":dates,"mag":cada["mag"],"lat":cada["lat"],"long":cada["long"],"depth":cada["depth"],"sig":cada["sig"],"gap":cada["gap"],
            "nst":cada["nst"],"title":cada["title"],"cdi":cada["cdi"],"mmi":cada["mmi"],"magType":cada["magType"],"type": cada["type"],"code":cada["code"]}
     return dato
-def req_3(data_structs):
+def req_3(data_structs,magnitud,profundidad):
     """
     Función que soluciona el requerimiento 3
     """
+    #cambie a float la profundidad carga de datos
+    mapa = data_structs["temblores_mag"]
+    lista_final= lt.newList("ARRAY_LIST")
+    diccionario=om.newMap("RBT")
+    maxima_mg = om.maxKey(mapa)
+    llaves = om.values(mapa,magnitud,maxima_mg)
+    for cada in lt.iterator(llaves):
+        mapita=cada["By_depth"]
+        minimo_prof= om.minKey(mapita)
+        resultado= om.values(mapita,minimo_prof,profundidad)
+        for ca in lt.iterator(resultado):
+            for temblor in lt.iterator(ca):
+                lt.addLast(lista_final,temblor)
+                fecha = datetime.datetime.strptime(temblor["time"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                dates = fecha.strftime('%Y-%m-%dT%H:%M')
+                entry= om.get(diccionario,dates)
+                if entry:
+                    valor= me.getValue(entry)
+                else:
+                    valor={"time":dates,"events":0,"details":lt.newList("ARRAY_LIST")}
+                    om.put(diccionario,dates,valor)
+                lista= valor["details"]
+                h= nuevo(temblor)
+                lt.addLast(lista,h)
+                valor["events"]+=1
+    pri= primeros(diccionario)
+
+    return pri, lt.size(lista_final)
+    #return pri,lista_final,lt.size(lista_final)
+
+
+def primeros(mapa):
+    lista= lt.newList("SINGLE_LINKED")
+    lista_final= om.keySet(mapa)
+    de= lt.size(lista_final)
+    sublista= lt.subList(lista_final,de-9,10)
+    for cada in lt.iterator(sublista):
+         result= me.getValue(om.get(mapa,cada))
+         lt.addFirst(lista,result)
+    return lista
     # TODO: Realizar el requerimiento 3
     pass
 
@@ -279,12 +322,71 @@ def req_6(data_structs):
     pass
 
 
-def req_7(data_structs):
+def req_7(data_structs,año, titulo, condicion):
     """
     Función que soluciona el requerimiento 7
     """
+    #crear nuevo mapa
+    #funcion de agregar
+    #añadir data
+    #llamar la funcion en carga de datos
+
+    mapa= data_structs["By_year"]
+    result= me.getValue(om.get(mapa,año))
+    mapa_de_lacondicon= om.newMap(omaptype='BST',
+                                      cmpfunction=compareDates)
+    titulos = om.keySet(result["arbol"])
+    cantidad_año= lt.size(result["lista"])
+    for cada in lt.iterator(titulos):
+        if titulo in cada:
+            return print(cada)
+            lisat_condicion= me.getValue(om.get(result["arbol"],cada))
+            for data in lt.iterator(lisat_condicion):
+                mapa_de_lacondicon=add_data_req_condicion(mapa_de_lacondicon,data,float(data[condicion]))
+                if not data[condicion]=="" or not data[condicion]==0:
+                    mapa_de_lacondicon=add_data_req_condicion(mapa_de_lacondicon,data,data[condicion])
+            
+
+
+
     # TODO: Realizar el requerimiento 7
     pass
+def agregar_req_7(mapa,data):
+    occurreddate = data['time']
+    fecha = datetime.datetime.strptime(occurreddate, "%Y-%m-%dT%H:%M:%S.%fZ")
+    dates = fecha.strftime('%Y')
+    entry = om.get(mapa, dates)
+    if entry is None:
+        datentry = {"lista":lt.newList("ARRAY_LIST"),"arbol":om.newMap(omaptype='BST',
+                                      cmpfunction=compareDates)}
+        om.put(mapa, dates, datentry)
+    else:
+        datentry = me.getValue(entry)
+    add_data_req_7(datentry,data)
+    lt.addLast(datentry["lista"],data)
+    return mapa
+
+def add_data_req_7(structs,data):
+    mapa= structs["arbol"]
+    entry= om.get(mapa,(data["title"]))
+    if entry:
+        lista= me.getValue(entry)
+    else:
+        lista= lt.newList("ARRAY_LIST")
+    lt.addLast(lista,data)
+    return structs
+
+def add_data_req_condicion(structs,data,llave):
+    mapa= structs
+    llave= round(llave,3)
+    entry= om.get(mapa,llave)
+    if entry:
+        lista= me.getValue(entry)
+    else:
+        lista= lt.newList("ARRAY_LIST")
+        om.put(mapa,llave,lista)
+    lt.addLast(lista,data)
+    return structs
 
 
 def req_8(data_structs):

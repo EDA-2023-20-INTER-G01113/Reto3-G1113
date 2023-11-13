@@ -109,6 +109,9 @@ def print_req_3(control):
     """
         Función que imprime la solución del Requerimiento 3 en consola
     """
+    resultado,cantidad= (controller.req_3(control))
+    print("La cantidad de eventos sismicos con esos parametros es de: "+ str(cantidad))
+    print(resultado)
     # TODO: Imprimir el resultado del requerimiento 3
     pass
 
@@ -141,6 +144,7 @@ def print_req_7(control):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
+    print(controller.req_7(control))
     # TODO: Imprimir el resultado del requerimiento 7
     pass
 
