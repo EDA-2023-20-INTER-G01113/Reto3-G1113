@@ -660,9 +660,10 @@ def req_7(data_structs,año, titulo, condicion, bins):
 
 def sacas(mapa, condicion):
     llaves= om.valueSet(mapa)
+    print(llaves)
     lista= lt.newList("ARRAY_LIST")
     for cada in lt.iterator(llaves): 
-        for evento in lt.iterator(cada):
+        for evento in lt.iterator(cada['By_time']):
             fecha = datetime.datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S.%fZ")
             dates = fecha.strftime('%Y-%m-%dT%H:%M')
             entrada= {"time":dates,"lat":round(float(evento["lat"]),3),"long":round(float(evento["long"]),3),"title":evento["title"],"code":evento["code"], condicion:evento[condicion]}

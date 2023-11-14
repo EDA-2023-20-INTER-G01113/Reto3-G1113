@@ -239,7 +239,7 @@ def req_7(control):
     condicion= input("Ingrese la condicion que desea consultar: ")
     bin= int(input("Ingrese la cantidad de segmentos (bins): "))
     totales,canti, usado, minimo, maximo, mapa =model.req_7(control,año,pais,condicion,bin)
-    end_time = end_time()
+    end_time = get_time()
     delta_times = delta_time(start_time, end_time)
     if usado>6:
         return totales, condicion,canti, usado, minimo, maximo,model.get_data_3(mapa,usado),delta_times
