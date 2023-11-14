@@ -61,7 +61,6 @@ def load_data(control, data_size):
 
     tamaño= size(control['lista_temblores'])
     lista= model.get_data_5(control["lista_temblores"],tamaño)
-
     return control,tamaño,lista
 
 
@@ -108,28 +107,32 @@ def get_data(control, id):
     pass
 
 
-def req_1(control,anio_inicio,anio_final):
+def req_1(control):
     """
     Retorna el resultado del requerimiento 1
     """
     # TODO: Modificar el requerimiento 1
-    respuesta,total =model.req_1(control,anio_inicio,anio_final)
+    anio_inicio = input("Año inicial: ")
+    anio_final = input("Año final: ")
+    respuesta,total, all_quakes =model.req_1(control,anio_inicio,anio_final)
     tamanio = size(respuesta)
     
     if tamanio>6:
-        return model.get_data_3(respuesta,tamanio),total
-    return respuesta,total
+        return model.get_data_3(respuesta,tamanio),total, all_quakes
+    return respuesta,total, all_quakes
 
 
-def req_2(control,im,fm):
+def req_2(control):
     """
     Retorna el resultado del requerimiento 2
     """
-    resultado,total = model.req_2(control,im,fm) 
+    im= float(input("INICIAL: "))
+    fm=float(input("FINAL: "))
+    resultado,total, all_quakes = model.req_2(control,im,fm) 
     tamano= size(resultado)
     if tamano>6:
-        return model.get_data_3(resultado,tamano),total
-    return resultado,total
+        return model.get_data_3(resultado,tamano),total, all_quakes
+    return resultado,total, all_quakes
     # TODO: Modificar el requerimiento 2
 
 
@@ -154,19 +157,20 @@ def req_4(control):
         return model.get_data_3(results,r_size),leng, dates, results
     return results, leng, dates, results
 
-def req_5(control,depth_min,min_estaciones_mon):
+def req_5(control):
     """
     Retorna el resultado del requerimiento 5
     """
     # TODO: Modificar el requerimiento 5
     #depth_min = float(input("Ingrese el minimo de profundidad que desea consultar: "))
     #min_estaciones_mon = int(input("Ingrese el numero minimo de estaciones de monitoreo que desea consultar: "))
-    
-    respuesta,total = model.req_5(control,depth_min, min_estaciones_mon)
+    depth_min = float(input("Profundida  minima: "))
+    min_estaciones_mon = int(input("Cantidad minima de estaciones de monitoreo: "))
+    respuesta,total, top_20 = model.req_5(control,depth_min, min_estaciones_mon)
     tamanio = size(respuesta)
     if tamanio>6:
-        return model.get_data_3(respuesta,tamanio),total
-    return respuesta,total
+        return model.get_data_3(respuesta,tamanio),total, top_20
+    return respuesta,total, top_20
 
 def req_6(control):
     """
@@ -176,7 +180,7 @@ def req_6(control):
     f_year = int(input("Ingrese el año sobre el cual quiere recibir información: "))
     lat = float(input("Ingrese la latitud de referencia: "))
     long = float(input("Ingrese la longitud de referencia: "))
-    radius = float(input("Ingrese el radio sobre el cual quiere recibir eventos: "))
+    radius = float(input("Ingrese el radio sobre el cual quiere recibir eventos (km): "))
     n_events = int(input("Ingrese el número de eventos: ")) 
     results, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events = model.req_6(control, lat, long, radius, n_events, f_year)
     r_size = lt.size(results)
@@ -208,8 +212,17 @@ def req_8(control):
                 f'7. Requerimiento 7:\n' )
     if req=='0':
         model.req_8(control, req)
+    elif req=='1':
+        _, _,results = req_1(control)
+        model.req_8(control, req, results)
+    elif req=='2':
+        _, _,results = req_2(control)
+        model.req_8(control, req, results)
     elif req=='4':
         _, _, _, results_list = req_4(control)
+        model.req_8(control, req, results_list)
+    elif req=='5':
+        _, _, results_list = req_5(control)
         model.req_8(control, req, results_list)
     elif req=='6':
         _, _, _, _, _, _, _, _, results_list, lat, long, radius = req_6(control)   

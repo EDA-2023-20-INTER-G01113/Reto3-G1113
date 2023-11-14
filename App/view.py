@@ -88,23 +88,26 @@ def print_data(control, id):
     #TODO: Realizar la función para imprimir un elemento
     pass
 
-def print_req_1(control,anio_inicio,anio_final):
+def print_req_1(control):
     """
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    respuesta,tamanio=controller.req_1(control, anio_inicio,anio_final)
+    respuesta,tamanio, _=controller.req_1(control)
     print("Total de fechas diferentes: " + str(tamanio))
     print("El total de eventos sismicos en este rango de fecha es: " + str(tamanio))
     print("Tamaño de consulta: " + str(tamanio) + " los primeros y ultimos 3 resultados son: ")
-    print(respuesta)
+    lista=[]
+    for x in lt.iterator(respuesta):
+        for elem in x['elements']:
+            lista.append(elem)
+    print(f'{tabulate(lista,headers="keys",tablefmt="grid")}')
 
-
-def print_req_2(control,im,fm):
+def print_req_2(control):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
-    res,tamano=controller.req_2(control,im,fm)
+    res,tamano, _=controller.req_2(control)
     print("El total de resultado es de : "+ str(tamano))
     # TODO: Imprimir el resultado del requerimiento 2
     for x in lt.iterator(res):
@@ -145,18 +148,19 @@ def print_req_4(control):
     print(r'Open \Data\maps\req4.html on your browser to see an interactive map with your results!')
 
 
-def print_req_5(control, depth_min, min_estaciones_mon):
+def print_req_5(control):
     """
         Función que imprime la solución del Requerimiento 5 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 5
     
-    respuesta,tamanio=controller.req_5(control,depth_min,min_estaciones_mon)
+    respuesta,tamanio, _=controller.req_5(control)
     print("Total de fechas diferentes: " + str(tamanio))
     print("El total de eventos sismicos entre fechas: " + str(tamanio))
     print("Seleccionando top 20")
     print("Tamaño de la consulta: " + str(tamanio) + "los primeros y ultimos 3 del top 20: ")
-    print(respuesta)
+    elems = [x for x in lt.iterator(respuesta)]
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
 
 
 def print_req_6(control):
@@ -232,14 +236,10 @@ Ingrese 8 si quiere cargar TODOS los datos."""
             print("Cargando información de los archivos ....\n")
             load_data(control,data)
         elif int(inputs) == 2:
-            anio_inicio = input("Año inicial: ")
-            anio_final = input("Año final: ")
-            print_req_1(control,anio_inicio, anio_final)
+            print_req_1(control)
 
         elif int(inputs) == 3:
-            im= float(input("INICIAL: "))
-            fm=float(input("FINAL: "))
-            print_req_2(control,im,fm)
+            print_req_2(control)
 
         elif int(inputs) == 4:
             print_req_3(control)
@@ -248,9 +248,7 @@ Ingrese 8 si quiere cargar TODOS los datos."""
             print_req_4(control)
 
         elif int(inputs) == 6:
-            depth_min = float(input("Profundida  minima: "))
-            min_estaciones_mon = int(input("Cantidad minima de estaciones de monitoreo: "))
-            print_req_5(control, depth_min, min_estaciones_mon)
+            print_req_5(control)
 
         elif int(inputs) == 7:
             print_req_6(control)

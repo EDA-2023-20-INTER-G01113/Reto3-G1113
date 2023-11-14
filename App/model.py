@@ -52,7 +52,7 @@ assert cf
 
 MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
 MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-MAX_MAP_PROPS = 200000
+MAX_MAP_PROPS = 100000
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
@@ -303,7 +303,7 @@ def req_1(control, fecha_inicio, fecha_final):
     
     total = 0
     lista_final = lt.newList("SINGLE_LINKED")
-    
+    all_quakes = lt.newList("ARRAY_LIST")
     for lst_fecha in lt.iterator(lst_rango_fechas):
         respuesta = me.getValue(om.get(control["temblores"],lst_fecha))
         tamanio = lt.size(respuesta["By_time"])
@@ -316,8 +316,11 @@ def req_1(control, fecha_inicio, fecha_final):
         if tamanio < 6:
             for ele in lt.iterator(orden):
                 d = nuevo(ele)
+                lt.addLast(all_quakes, d)
                 lt.addLast(info_adicional,d)
         else:
+            for x in lt.iterator(orden):
+                lt.addLast(all_quakes, x)
             for date in range(1,4):
                 info = lt.getElement(orden,date)
                 info = nuevo(info)
@@ -327,7 +330,7 @@ def req_1(control, fecha_inicio, fecha_final):
                 info = lt.addLast(info_adicional,info)
                 lt.addLast(info_adicional,info)
         lt.addFirst(lista_final,info_adicional)
-    return lista_final, total
+    return lista_final, total, all_quakes
          
 def req_2(analyzer,initialmag, finalmag ):
     """
@@ -336,6 +339,7 @@ def req_2(analyzer,initialmag, finalmag ):
     total=0
     lista= lt.newList("SINGLE_LINKED")
     lst = om.keys(analyzer['temblores_mag'], initialmag, finalmag)
+    all_quakes = lt.newList("ARRAY_LIST")
     for lstmag in lt.iterator(lst):
         result= me.getValue(om.get(analyzer['temblores_mag'],lstmag))
         tamano=lt.size(result["By_mag"])
@@ -347,7 +351,11 @@ def req_2(analyzer,initialmag, finalmag ):
             for cada in lt.iterator(ordenada):
                 dato=nuevo(cada)
                 lt.addLast(detalles,dato)
+                lt.addLast(all_quakes, dato)
+
         else:
+            for x in lt.iterator(ordenada):
+                lt.addLast(all_quakes, x)
             for b in range(1,4):
                 dato = lt.getElement(ordenada, b)
                 dato=nuevo(dato)
@@ -357,7 +365,7 @@ def req_2(analyzer,initialmag, finalmag ):
                 dato=nuevo(dato)
                 lt.addLast(detalles,dato)
         lt.addFirst(lista,diccionario)
-    return lista,total
+    return lista,total, all_quakes
     # TODO: Realizar el requerimiento 2
     
 def nuevo(cada):
@@ -467,7 +475,7 @@ def req_5(control, depth_min, min_estaciones_mon ):
             info = lt.getElement(top_20,i)
             lt.addLast(lista_final_1,info)
         
-    return lista_final_1, total
+    return lista_final_1, total, top_20
              
     
     
@@ -620,21 +628,22 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             m.save(path)
             os.system(f'start {path}')
 
-    elif req=='2':
-        pass
-        """ try:
+    elif req=='1':
+        try:
             m= folium.Map(tiles=MAP_TILE, 
                         attr=MAP_ATTRIBUTES)
             mCluster = MarkerCluster(name="Cluster").add_to(m)
-            path = r'.\Data\maps\req2.html'
-            for mag in lt.iterator(list_result):
-                for result in lt.iterator(mag['Details']):
-                    mssg=''
-                    for key in result:
-                        mssg += f'{key}: {result[key]}\n'
-                    folium.Marker(location=[float(result['lat']),float(result['long'])],
+            path = '.\\Data\\maps\\req1.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
                             tooltip= html.escape(result['title']).replace('`','&#96;'),
                             popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
             folium.LayerControl().add_to(m)
             m.save(path)
             os.system(f'start {path}')
@@ -642,19 +651,59 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
             m= folium.Map()
             mCluster = MarkerCluster(name="Cluster").add_to(m)
-            path = r'.\Data\maps\req2.html'
-            for mag in lt.iterator(list_result):
-                for result in lt.iterator(mag['Details']):
-                    mssg=''
-                    for key in result:
-                        mssg += f'{key}: {result[key]}\n'
-                    folium.Marker(location=[float(result['lat']),float(result['long'])],
+            path = '.\\Data\\maps\\req4.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
                             tooltip= html.escape(result['title']).replace('`','&#96;'),
                             popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
             folium.LayerControl().add_to(m)
             m.save(path)
-            os.system(f'start {path}') """
+            os.system(f'start {path}') 
     
+    elif req=='2':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = '.\\Data\\maps\\req2.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = '.\\Data\\maps\\req4.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}') 
+
     elif req=='4':
         try:
             m= folium.Map(tiles=MAP_TILE, 
@@ -679,6 +728,44 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             m= folium.Map()
             mCluster = MarkerCluster(name="Cluster").add_to(m)
             path = '.\\Data\\maps\\req4.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+
+    elif req=='5':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = '.\\Data\\maps\\req5.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = '.\\Data\\maps\\req5.html'
             for result in lt.iterator(list_result):
                 mssg=''
                 for key in result:
