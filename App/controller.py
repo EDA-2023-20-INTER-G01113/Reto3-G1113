@@ -112,27 +112,33 @@ def req_1(control):
     Retorna el resultado del requerimiento 1
     """
     # TODO: Modificar el requerimiento 1
+    start_time = get_time()
     anio_inicio = input("Año inicial: ")
     anio_final = input("Año final: ")
     respuesta,total, all_quakes =model.req_1(control,anio_inicio,anio_final)
     tamanio = size(respuesta)
-    
+    end_time = get_time
+    delta_times = delta_time(start_time, end_time)
     if tamanio>6:
-        return model.get_data_3(respuesta,tamanio),total, all_quakes
-    return respuesta,total, all_quakes
+        return model.get_data_3(respuesta,tamanio),total, all_quakes, delta_times
+    return respuesta,total, all_quakes, delta_times
 
 
 def req_2(control):
     """
     Retorna el resultado del requerimiento 2
     """
+    start_time = get_time()
     im= float(input("INICIAL: "))
     fm=float(input("FINAL: "))
     resultado,total, all_quakes = model.req_2(control,im,fm) 
     tamano= size(resultado)
+    end_time=get_time()
+    delta_times = delta_time(start_time, end_time)
+
     if tamano>6:
-        return model.get_data_3(resultado,tamano),total, all_quakes
-    return resultado,total, all_quakes
+        return model.get_data_3(resultado,tamano),total, all_quakes, delta_times
+    return resultado,total, all_quakes, delta_times
     # TODO: Modificar el requerimiento 2
 
 
@@ -140,13 +146,17 @@ def req_3(control):
     """
     Retorna el resultado del requerimiento 3
     """
+    start_time = get_time()
     profundidad=round(float(input("Ingrese la profundidad máxima: ")),3)
     mag= round(float(input("Ingrese la magnitud mínima: ")),3)
     resultado, cantidad = model.req_3(control,mag, profundidad)
+    end_time = get_time()
+    delta_times = delta_time(start_time, end_time)
+
     if cantidad >6:
-        return model.get_data_3(resultado,10),cantidad
+        return model.get_data_3(resultado,10),cantidad, delta_times
     else:
-        return resultado, cantidad
+        return resultado, cantidad, delta_times
     # TODO: Modificar el requerimiento 3
     pass
 
@@ -156,13 +166,16 @@ def req_4(control):
     Retorna el resultado del requerimiento 4
     """
     # TODO: Modificar el requerimiento 4
+    start_time = get_time()
     min_sig = float(input("Ingrese la significancia mínima del evento: "))
     max_gap = float(input("Ingrese la distancia azimutal máxima del evento: "))
     results, leng, dates  = model.req_4(control, min_sig, max_gap)
     r_size = lt.size(results)
+    end_time = get_time()
+    delta_times = delta_time(start_time, end_time)
     if r_size>6:
-        return model.get_data_3(results,r_size),leng, dates, results
-    return results, leng, dates, results
+        return model.get_data_3(results,r_size),leng, dates, results, delta_times
+    return results, leng, dates, results, delta_times
 
 def req_5(control):
     """
@@ -171,19 +184,23 @@ def req_5(control):
     # TODO: Modificar el requerimiento 5
     #depth_min = float(input("Ingrese el minimo de profundidad que desea consultar: "))
     #min_estaciones_mon = int(input("Ingrese el numero minimo de estaciones de monitoreo que desea consultar: "))
+    start_time = get_time()
     depth_min = float(input("Profundida  minima: "))
     min_estaciones_mon = int(input("Cantidad minima de estaciones de monitoreo: "))
     respuesta,total, top_20 = model.req_5(control,depth_min, min_estaciones_mon)
     tamanio = size(respuesta)
+    end_time = get_time()
+    delta_times = delta_time(start_time, end_time)
     if tamanio>6:
-        return model.get_data_3(respuesta,tamanio),total, top_20
-    return respuesta,total, top_20
+        return model.get_data_3(respuesta,tamanio),total, top_20, delta_times
+    return respuesta,total, top_20, delta_times
 
 def req_6(control):
     """
     Retorna el resultado del requerimiento 6
     """
     # TODO: Modificar el requerimiento 6
+    start_time = get_time()
     f_year = int(input("Ingrese el año sobre el cual quiere recibir información: "))
     lat = float(input("Ingrese la latitud de referencia: "))
     long = float(input("Ingrese la longitud de referencia: "))
@@ -191,15 +208,20 @@ def req_6(control):
     n_events = int(input("Ingrese el número de eventos: ")) 
     results, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events = model.req_6(control, lat, long, radius, n_events, f_year)
     r_size = lt.size(results)
+    end_time = get_time()
+    delta_times = delta_time(start_time, end_time)
     if r_size>6:
-        return model.get_data_3(results,r_size), post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events, results, lat, long, radius
-    return results, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events, results, lat, long, radius
+        return model.get_data_3(results,r_size), post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events, results, lat, long, radius, delta_times
+    return results, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events, results, lat, long, radius, delta_times
 
 def req_7(control):
     """
     Retorna el resultado del requerimiento 7
     """
-    return model.req_7(control,"2020","Alaska", "mag")
+    start_time = get_time()
+    end_time = end_time()
+    delta_times = delta_time(start_time, end_time)
+    return model.req_7(control,"2020","Alaska", "mag"), delta_times
     # TODO: Modificar el requerimiento 7
     pass
 
@@ -221,26 +243,26 @@ def req_8(control):
     if req=='0':
         model.req_8(control, req)
     elif req=='1':
-        _, _,results = req_1(control)
+        _, _,results,_ = req_1(control)
         model.req_8(control, req, results)
     elif req=='2':
-        _, _,results = req_2(control)
+        _, _,results,_ = req_2(control)
         model.req_8(control, req, results)
     elif req=='3':
-        results, _ = req_3(control)
+        results, _ ,_= req_3(control)
         results_list=lt.newList("ARRAY_LIST")
         for x in lt.iterator(results):
             for elem in lt.iterator(x['details']):
                 lt.addLast(results_list, elem)
         model.req_8(control, req, results_list)
     elif req=='4':
-        _, _, _,results_list = req_4(control)
+        _, _, _,results_list,_ = req_4(control)
         model.req_8(control, req, results_list)
     elif req=='5':
-        _, _, results_list = req_5(control)
+        _, _, results_list,_ = req_5(control)
         model.req_8(control, req, results_list)
     elif req=='6':
-        _, _, _, _, _, _, _, _, results_list, lat, long, radius = req_6(control)   
+        _, _, _, _, _, _, _, _, results_list, lat, long, radius,_ = req_6(control)   
         model.req_8(control, req, results_list, lat, long, radius)
 
 

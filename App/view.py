@@ -93,7 +93,7 @@ def print_req_1(control):
         Función que imprime la solución del Requerimiento 1 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 1
-    respuesta,tamanio, _=controller.req_1(control)
+    respuesta,tamanio, _, delta_times=controller.req_1(control)
     print("Total de fechas diferentes: " + str(tamanio))
     print("El total de eventos sismicos en este rango de fecha es: " + str(tamanio))
     print("Tamaño de consulta: " + str(tamanio) + " los primeros y ultimos 3 resultados son: ")
@@ -103,12 +103,13 @@ def print_req_1(control):
             lista.append(elem)
     print(f'{tabulate(lista,headers="keys",tablefmt="grid")}')
     print(f'\n')
+    print(f'Tiempo transcurrido: {delta_times} ms.')
     print(r'Open \Data\maps\req1.html on your browser to see an interactive map with your results! (must execute req8 first)')
 def print_req_2(control):
     """
         Función que imprime la solución del Requerimiento 2 en consola
     """
-    res,tamano, _=controller.req_2(control)
+    res,tamano, _, delta_times=controller.req_2(control)
     print("El total de resultado es de : "+ str(tamano))
     # TODO: Imprimir el resultado del requerimiento 2
     for x in lt.iterator(res):
@@ -120,6 +121,7 @@ def print_req_2(control):
     print(f'\n')
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
+    print(f'Tiempo transcurrido: {delta_times} ms.')
     print(r'Open \Data\maps\req2.html on your browser to see an interactive map with your results! (must execute req8 first)')
 
 
@@ -127,7 +129,7 @@ def print_req_3(control):
     """
         Función que imprime la solución del Requerimiento 3 en consola
     """
-    resultado,cantidad= (controller.req_3(control))
+    resultado,cantidad, delta_times= (controller.req_3(control))
     print("La cantidad de eventos sismicos con esos parametros es de: "+ str(cantidad))
     for x in lt.iterator(resultado):
         lista = []
@@ -138,6 +140,7 @@ def print_req_3(control):
     print(f'\n')
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
+    print(f'Tiempo transcurrido: {delta_times} ms.')
     print(r'Open \Data\maps\req3.html on your browser to see an interactive map with your results! (must execute req8 first)')
     # TODO: Imprimir el resultado del requerimiento 3
     
@@ -149,7 +152,7 @@ def print_req_4(control):
     """
     # TODO: Imprimir el resultado del requerimiento 4
 
-    results, length, dates, _ = controller.req_4(control)
+    results, length, dates, _, delta_times = controller.req_4(control)
     
     elems = [x for x in lt.iterator(results)]
 
@@ -158,6 +161,7 @@ def print_req_4(control):
     print(f'\n')
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
+    print(f'Tiempo transcurrido: {delta_times} ms.')
     print(r'Open \Data\maps\req4.html on your browser to see an interactive map with your results! (must execute req8 first)')
 
 
@@ -167,7 +171,7 @@ def print_req_5(control):
     """
     # TODO: Imprimir el resultado del requerimiento 5
     
-    respuesta,tamanio, _=controller.req_5(control)
+    respuesta,tamanio, _, delta_times=controller.req_5(control)
     print("Total de fechas diferentes: " + str(tamanio))
     print("El total de eventos sismicos entre fechas: " + str(tamanio))
     print("Seleccionando top 20")
@@ -175,6 +179,7 @@ def print_req_5(control):
     elems = [x for x in lt.iterator(respuesta)]
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
+    print(f'Tiempo transcurrido: {delta_times} ms.')
     print(r'Open \Data\maps\req5.html on your browser to see an interactive map with your results! (must execute req8 first)')
 
 def print_req_6(control):
@@ -182,7 +187,7 @@ def print_req_6(control):
         Función que imprime la solución del Requerimiento 6 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 6
-    results, post_events, pre_events, total_events, total_dates, code, event, radius_events, _, _, _, _= controller.req_6(control)
+    results, post_events, pre_events, total_events, total_dates, code, event, radius_events, _, _, _, _, delta_times= controller.req_6(control)
     elems = [x for x in lt.iterator(results)]
 
     print(f'Max event code: {code}')
@@ -207,6 +212,7 @@ def print_req_6(control):
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
     print(f'\n')
+    print(f'Tiempo transcurrido: {delta_times} ms.')
     print(r'Open \Data\maps\req6.html on your browser to see an interactive map with your results! (must execute req8 first)')
 
 def print_req_7(control):
@@ -214,6 +220,7 @@ def print_req_7(control):
         Función que imprime la solución del Requerimiento 7 en consola
     """
     print(controller.req_7(control))
+
     # TODO: Imprimir el resultado del requerimiento 7
     pass
 
