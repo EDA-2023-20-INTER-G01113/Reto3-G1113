@@ -234,9 +234,19 @@ def req_7(control):
     Retorna el resultado del requerimiento 7
     """
     start_time = get_time()
+    año= input("Ingrese el año: ")
+    pais= input("Ingrese la region que desea consultar: ")
+    condicion= input("Ingrese la condicion que desea consultar: ")
+    bin= int(input("Ingrese la cantidad de segmentos (bins): "))
+    totales,canti, usado, minimo, maximo, mapa =model.req_7(control,año,pais,condicion,bin)
     end_time = end_time()
     delta_times = delta_time(start_time, end_time)
-    return model.req_7(control,"2020","Alaska", "mag"), delta_times
+    if usado>6:
+        return totales, condicion,canti, usado, minimo, maximo,model.get_data_3(mapa,usado),delta_times
+
+    else:
+        return totales, condicion, canti, usado, minimo, maximo, mapa,delta_times
+
     # TODO: Modificar el requerimiento 7
     pass
 

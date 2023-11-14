@@ -49,6 +49,7 @@ import os
 import html
 from datetime import date
 assert cf
+import matplotlib.pyplot as plt
 
 MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
 MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
@@ -617,7 +618,7 @@ def req_6(data_structs,lat, long, radius, n_events, f_year):
     return return_list, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events
 
 
-def req_7(data_structs,año, titulo, condicion):
+def req_7(data_structs,año, titulo, condicion, bins):
     """
     Función que soluciona el requerimiento 7
     """
@@ -628,18 +629,64 @@ def req_7(data_structs,año, titulo, condicion):
 
     mapa= data_structs["By_year"]
     result= me.getValue(om.get(mapa,año))
-    mapa_de_lacondicon= om.newMap(omaptype='BST',
+    mapa_de_lacondicon= om.newMap(omaptype='RBT',
                                       cmpfunction=compareDates)
+    mapa_data= om.newMap(omaptype='RBT',
+                                      cmpfunction=compareDates)
+    diccionario ={}
     titulos = om.keySet(result["arbol"])
     cantidad_año= lt.size(result["lista"])
+    totales=0
     for cada in lt.iterator(titulos):
         if titulo in cada:
-            return print(cada)
             lisat_condicion= me.getValue(om.get(result["arbol"],cada))
             for data in lt.iterator(lisat_condicion):
-                mapa_de_lacondicon=add_data_req_condicion(mapa_de_lacondicon,data,float(data[condicion]))
-                if not data[condicion]=="" or not data[condicion]==0:
-                    mapa_de_lacondicon=add_data_req_condicion(mapa_de_lacondicon,data,data[condicion])
+                totales+=1
+                if not data[condicion]=="" and not data[condicion]==0:
+                    mapa_data=uptime(mapa_data,data)
+                    mapa_de_lacondicon= add_data_req_condicion(mapa_de_lacondicon, float(data[condicion]))
+                    if float(data[condicion]) in diccionario:
+                        diccionario[float(data[condicion])]+=1
+                    else:
+                        diccionario[float(data[condicion])]=1
+    minimo = om.minKey(mapa_de_lacondicon)
+    maximo= om.maxKey(mapa_de_lacondicon)
+    usados = 0
+    for cada in lt.iterator(om.valueSet(mapa_de_lacondicon)):
+        usados+= int(cada)
+    posible_lo(diccionario, bins, condicion, minimo,maximo)
+    lista=sacas(mapa_data, condicion)
+    return totales,cantidad_año, usados,minimo, maximo,lista
+
+def sacas(mapa, condicion):
+    llaves= om.valueSet(mapa)
+    lista= lt.newList("ARRAY_LIST")
+    for cada in lt.iterator(llaves): 
+        for evento in lt.iterator(cada):
+            fecha = datetime.datetime.strptime(evento["time"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            dates = fecha.strftime('%Y-%m-%dT%H:%M')
+            entrada= {"time":dates,"lat":round(float(evento["lat"]),3),"long":round(float(evento["long"]),3),"title":evento["title"],"code":evento["code"], condicion:evento[condicion]}
+            lt.addLast(lista, entrada)
+    return lista
+                
+def posible_lo(mapa,bin,condicion, minimo, maximo): 
+
+    valores = list(mapa.keys())
+    frecuencia= list(mapa.values())
+    resta =(maximo -minimo )/bin
+    lista=[]
+    for cada in range(0,bin+1):
+        lista.append(minimo+(cada*resta))
+    plt.hist(valores, weights=frecuencia, bins=lista, edgecolor = "white", color='#F2AB6D', rwidth=0.85)
+    plt.title('Histograma')
+    plt.xlabel("By " + str(condicion))
+    plt.ylabel('Frecuencia')
+    plt.xticks(lista)
+    plt.show()
+
+            
+
+
     # TODO: Realizar el requerimiento 7
     pass
 def agregar_req_7(mapa,data):
@@ -648,7 +695,7 @@ def agregar_req_7(mapa,data):
     dates = fecha.strftime('%Y')
     entry = om.get(mapa, dates)
     if entry is None:
-        datentry = {"lista":lt.newList("ARRAY_LIST"),"arbol":om.newMap(omaptype='BST',
+        datentry = {"lista":lt.newList("ARRAY_LIST"),"arbol":om.newMap(omaptype='RBT',
                                       cmpfunction=compareDates)}
         om.put(mapa, dates, datentry)
     else:
@@ -664,20 +711,34 @@ def add_data_req_7(structs,data):
         lista= me.getValue(entry)
     else:
         lista= lt.newList("ARRAY_LIST")
+        om.put(mapa,(data["title"]),lista)
     lt.addLast(lista,data)
     return structs
 
-def add_data_req_condicion(structs,data,llave):
+def add_data_req_condicion(structs,llave):
     mapa= structs
     llave= round(llave,3)
     entry= om.get(mapa,llave)
     if entry:
-        lista= me.getValue(entry)
+        lista= int(me.getValue(entry))
+    else:
+        lista= 0
+    lista+=1
+    om.put(mapa,llave,lista)
+    return structs
+
+def add_data_req_condicion_data(structs,data, llave):
+    mapa= structs
+    llave= round(llave,3)
+    entry= om.get(mapa,llave)
+    if entry:
+        lista= (me.getValue(entry))
     else:
         lista= lt.newList("ARRAY_LIST")
         om.put(mapa,llave,lista)
     lt.addLast(lista,data)
     return structs
+
 
 def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
     """

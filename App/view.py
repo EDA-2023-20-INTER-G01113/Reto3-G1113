@@ -219,10 +219,15 @@ def print_req_7(control):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
-    print(controller.req_7(control))
+    totales, condicion, canti, usado, minimo, maximo, mapa,delta=controller.req_7(control)
+    print("La cantidad total de eventos sismicos en el año son de "+str(canti))
+    print("La cantidad total de eventos sismicos en el año y en la region son de "+str(totales))
+    print("La cantidad total de eventos sismicos usados en el histograma son: "+str(usado))
+    print("El valor minimo de "+ str(condicion +" es de "+ str(minimo)))
+    print("El valor maximo de "+ str(condicion +" es de "+ str(maximo)))
+    print(mapa)
+    print(delta)
 
-    # TODO: Imprimir el resultado del requerimiento 7
-    pass
 
 
 def print_req_8(control):
