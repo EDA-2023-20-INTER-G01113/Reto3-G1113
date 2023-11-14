@@ -166,7 +166,16 @@ def req_7(control):
     """
     Retorna el resultado del requerimiento 7
     """
-    return model.req_7(control,"2020","Alaska", "mag")
+    año= input("Ingrese el año: ")
+    pais= input("Ingrese la region que desea consultar: ")
+    condicion= input("Ingrese la condicion que desea consultar: ")
+    bin= int(input("Ingrese la cantidad de segmentos (bins): "))
+    totales,canti, usado, minimo, maximo, mapa =model.req_7(control,año,pais,condicion,bin)
+    if usado>6:
+        return totales, condicion,canti, usado, minimo, maximo,model.get_data_3(mapa,usado)
+
+    else:
+        return totales, condicion, canti, usado, minimo, maximo, mapa
     # TODO: Modificar el requerimiento 7
     pass
 
