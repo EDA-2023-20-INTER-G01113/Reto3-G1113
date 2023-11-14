@@ -637,11 +637,13 @@ def req_7(data_structs,año, titulo, condicion, bins):
     titulos = om.keySet(result["arbol"])
     cantidad_año= lt.size(result["lista"])
     totales=0
+    total_list = lt.newList("ARRAY_LIST")
     for cada in lt.iterator(titulos):
         if titulo in cada:
             lisat_condicion= me.getValue(om.get(result["arbol"],cada))
             for data in lt.iterator(lisat_condicion):
                 totales+=1
+                lt.addLast(total_list,data)
                 if not data[condicion]=="" and not data[condicion]==0:
                     mapa_data=uptime(mapa_data,data)
                     mapa_de_lacondicon= add_data_req_condicion(mapa_de_lacondicon, float(data[condicion]))
@@ -656,11 +658,10 @@ def req_7(data_structs,año, titulo, condicion, bins):
         usados+= int(cada)
     posible_lo(diccionario, bins, condicion, minimo,maximo)
     lista=sacas(mapa_data, condicion)
-    return totales,cantidad_año, usados,minimo, maximo,lista
+    return totales,cantidad_año, usados,minimo, maximo,lista, total_list
 
 def sacas(mapa, condicion):
     llaves= om.valueSet(mapa)
-    print(llaves)
     lista= lt.newList("ARRAY_LIST")
     for cada in lt.iterator(llaves): 
         for evento in lt.iterator(cada['By_time']):
@@ -1027,6 +1028,43 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             m.save(path)
             os.system(f'start {path}')
 
+    elif req=='7':
+        try:
+            m= folium.Map(tiles=MAP_TILE, 
+                        attr=MAP_ATTRIBUTES)
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = '.\\Data\\maps\\req7.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
+        except Exception as e:
+            print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
+            m= folium.Map()
+            mCluster = MarkerCluster(name="Cluster").add_to(m)
+            path = '.\\Data\\maps\\req7.html'
+            for result in lt.iterator(list_result):
+                mssg=''
+                for key in result:
+                    mssg += f'{key}: {result[key]}\n'
+                folium.Marker(location=[float(result['lat']),float(result['long'])],
+                            tooltip= html.escape(result['title']).replace('`','&#96;'),
+                            popup=Popup(mssg,parse_html=True)).add_to(mCluster)
+                props+=1
+                if props>MAX_MAP_PROPS:
+                    break
+            folium.LayerControl().add_to(m)
+            m.save(path)
+            os.system(f'start {path}')
 # Funciones utilizadas para comparar elementos dentro de una lista
 
 def compare(data_1, data_2):
