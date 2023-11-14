@@ -114,10 +114,12 @@ def req_1(control):
     # TODO: Modificar el requerimiento 1
     start_time = get_time()
     anio_inicio = input("Año inicial: ")
-    anio_final = input("Año final: ")
+    anio_final = input("Año final: ") 
+    """  anio_inicio = '1999-03-21T05:00'
+    anio_final = '2004-10-23T17:30' """
     respuesta,total, all_quakes =model.req_1(control,anio_inicio,anio_final)
     tamanio = size(respuesta)
-    end_time = get_time
+    end_time = get_time()
     delta_times = delta_time(start_time, end_time)
     if tamanio>6:
         return model.get_data_3(respuesta,tamanio),total, all_quakes, delta_times
@@ -129,8 +131,10 @@ def req_2(control):
     Retorna el resultado del requerimiento 2
     """
     start_time = get_time()
+    """ im = float(3.5)
+    fm = float(6.5) """
     im= float(input("INICIAL: "))
-    fm=float(input("FINAL: "))
+    fm=float(input("FINAL: ")) 
     resultado,total, all_quakes = model.req_2(control,im,fm) 
     tamano= size(resultado)
     end_time=get_time()
@@ -147,8 +151,10 @@ def req_3(control):
     Retorna el resultado del requerimiento 3
     """
     start_time = get_time()
+    """ profundidad = float(10.000)
+    mag = 4.700 """
     profundidad=round(float(input("Ingrese la profundidad máxima: ")),3)
-    mag= round(float(input("Ingrese la magnitud mínima: ")),3)
+    mag= round(float(input("Ingrese la magnitud mínima: ")),3) 
     resultado, cantidad = model.req_3(control,mag, profundidad)
     end_time = get_time()
     delta_times = delta_time(start_time, end_time)
@@ -167,8 +173,10 @@ def req_4(control):
     """
     # TODO: Modificar el requerimiento 4
     start_time = get_time()
+    """ min_sig = float(300)
+    max_gap = float(45.000) """
     min_sig = float(input("Ingrese la significancia mínima del evento: "))
-    max_gap = float(input("Ingrese la distancia azimutal máxima del evento: "))
+    max_gap = float(input("Ingrese la distancia azimutal máxima del evento: ")) 
     results, leng, dates  = model.req_4(control, min_sig, max_gap)
     r_size = lt.size(results)
     end_time = get_time()
@@ -185,8 +193,10 @@ def req_5(control):
     #depth_min = float(input("Ingrese el minimo de profundidad que desea consultar: "))
     #min_estaciones_mon = int(input("Ingrese el numero minimo de estaciones de monitoreo que desea consultar: "))
     start_time = get_time()
+    """ depth_min = 23.000
+    min_estaciones_mon = 38 """
     depth_min = float(input("Profundida  minima: "))
-    min_estaciones_mon = int(input("Cantidad minima de estaciones de monitoreo: "))
+    min_estaciones_mon = int(input("Cantidad minima de estaciones de monitoreo: ")) 
     respuesta,total, top_20 = model.req_5(control,depth_min, min_estaciones_mon)
     tamanio = size(respuesta)
     end_time = get_time()
@@ -201,11 +211,16 @@ def req_6(control):
     """
     # TODO: Modificar el requerimiento 6
     start_time = get_time()
+    """f_year = 2022
+    lat = 4.674
+    long = -74.068
+    radius = 3000
+    n_events = 5 """
     f_year = int(input("Ingrese el año sobre el cual quiere recibir información: "))
     lat = float(input("Ingrese la latitud de referencia: "))
     long = float(input("Ingrese la longitud de referencia: "))
     radius = float(input("Ingrese el radio sobre el cual quiere recibir eventos (km): "))
-    n_events = int(input("Ingrese el número de eventos: ")) 
+    n_events = int(input("Ingrese el número de eventos: "))  
     results, post_events, pre_events, total_events, total_dates, sig_code, sig_event, radius_events = model.req_6(control, lat, long, radius, n_events, f_year)
     r_size = lt.size(results)
     end_time = get_time()
@@ -240,6 +255,7 @@ def req_8(control):
                 f'5. Requerimiento 5\n'
                 f'6. Requerimiento 6\n'
                 f'7. Requerimiento 7:\n' )
+    start_time = get_time()
     if req=='0':
         model.req_8(control, req)
     elif req=='1':
@@ -265,7 +281,9 @@ def req_8(control):
         _, _, _, _, _, _, _, _, results_list, lat, long, radius,_ = req_6(control)   
         model.req_8(control, req, results_list, lat, long, radius)
 
-
+    end_time = get_time()
+    delta_times = delta_time(start_time, end_time)
+    return delta_times
 # Funciones para medir tiempos de ejecucion
 
 def get_time():

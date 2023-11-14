@@ -230,8 +230,8 @@ def print_req_8(control):
         Función que imprime la solución del Requerimiento 8 en consola
     """
     # TODO: Imprimir el resultado del requerimiento 8
-    controller.req_8(control)
-
+    delta_times = controller.req_8(control)
+    print(f'Tiempo transcurrido: {delta_times} ms.')
 # Se crea el controlador asociado a la vista
 control = new_controller()
 
