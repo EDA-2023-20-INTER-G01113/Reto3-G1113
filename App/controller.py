@@ -238,14 +238,14 @@ def req_7(control):
     pais= input("Ingrese la region que desea consultar: ")
     condicion= input("Ingrese la condicion que desea consultar: ")
     bin= int(input("Ingrese la cantidad de segmentos (bins): "))
-    totales,canti, usado, minimo, maximo, mapa, total_list =model.req_7(control,año,pais,condicion,bin)
+    diccionario, totales,canti, usado, minimo, maximo, mapa, total_list =model.req_7(control,año,pais,condicion,bin)
     end_time = get_time()
     delta_times = delta_time(start_time, end_time)
     if usado>6:
-        return totales, condicion,canti, usado, minimo, maximo,model.get_data_3(mapa,usado),delta_times, total_list
+        return bin,diccionario, totales, condicion,canti, usado, minimo, maximo,model.get_data_3(mapa,usado),delta_times, total_list
 
     else:
-        return totales, condicion, canti, usado, minimo, maximo, mapa,delta_times, total_list
+        return bin, diccionario, totales, condicion, canti, usado, minimo, maximo, mapa,delta_times, total_list
 
     # TODO: Modificar el requerimiento 7
     pass

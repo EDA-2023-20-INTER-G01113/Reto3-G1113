@@ -49,7 +49,6 @@ import os
 import html
 from datetime import date
 assert cf
-import matplotlib.pyplot as plt
 
 MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
 MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
@@ -656,9 +655,8 @@ def req_7(data_structs,año, titulo, condicion, bins):
     usados = 0
     for cada in lt.iterator(om.valueSet(mapa_de_lacondicon)):
         usados+= int(cada)
-    posible_lo(diccionario, bins, condicion, minimo,maximo)
     lista=sacas(mapa_data, condicion)
-    return totales,cantidad_año, usados,minimo, maximo,lista, total_list
+    return diccionario, totales,cantidad_año, usados,minimo, maximo,lista, total_list
 
 def sacas(mapa, condicion):
     llaves= om.valueSet(mapa)
@@ -671,20 +669,6 @@ def sacas(mapa, condicion):
             lt.addLast(lista, entrada)
     return lista
                 
-def posible_lo(mapa,bin,condicion, minimo, maximo): 
-
-    valores = list(mapa.keys())
-    frecuencia= list(mapa.values())
-    resta =(maximo -minimo )/bin
-    lista=[]
-    for cada in range(0,bin+1):
-        lista.append(minimo+(cada*resta))
-    plt.hist(valores, weights=frecuencia, bins=lista, edgecolor = "white", color='#F2AB6D', rwidth=0.85)
-    plt.title('Histograma')
-    plt.xlabel("By " + str(condicion))
-    plt.ylabel('Frecuencia')
-    plt.xticks(lista)
-    plt.show()
 
             
 

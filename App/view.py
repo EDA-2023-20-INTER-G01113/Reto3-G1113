@@ -33,6 +33,7 @@ from DISClib.DataStructures import mapentry as me
 assert cf
 from tabulate import tabulate
 import traceback
+import matplotlib.pyplot as plt
 
 """
 La vista se encarga de la interacción con el usuario
@@ -219,7 +220,7 @@ def print_req_7(control):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
-    totales, condicion, canti, usado, minimo, maximo, mapa,delta,_=controller.req_7(control)
+    bine, diccionario, totales, condicion, canti, usado, minimo, maximo, mapa,delta,_=controller.req_7(control)
     print("La cantidad total de eventos sismicos en el año son de "+str(canti))
     print("La cantidad total de eventos sismicos en el año y en la region son de "+str(totales))
     print("La cantidad total de eventos sismicos usados en el histograma son: "+str(usado))
@@ -228,6 +229,22 @@ def print_req_7(control):
     elems = [x for x in lt.iterator(mapa)]
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'Tiempo transcurrido: {delta} ms.')
+    posible_lo(diccionario,bine, condicion,minimo,maximo )
+
+def posible_lo(mapa,bin,condicion, minimo, maximo): 
+
+    valores = list(mapa.keys())
+    frecuencia= list(mapa.values())
+    resta =(maximo -minimo )/bin
+    lista=[]
+    for cada in range(0,bin+1):
+        lista.append(minimo+(cada*resta))
+    plt.hist(valores, weights=frecuencia, bins=lista, edgecolor = "white", color='#F2AB6D', rwidth=0.85)
+    plt.title('Histograma')
+    plt.xlabel("By " + str(condicion))
+    plt.ylabel('Frecuencia')
+    plt.xticks(lista)
+    plt.show()
 
 
 
