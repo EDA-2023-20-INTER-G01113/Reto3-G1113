@@ -52,7 +52,7 @@ assert cf
 
 MAP_TILE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
 MAP_ATTRIBUTES = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
-MAX_MAP_PROPS = 10000
+MAX_MAP_PROPS = 200000
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá
@@ -587,7 +587,7 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             m= folium.Map(tiles=MAP_TILE, 
                         attr=MAP_ATTRIBUTES)
             mCluster = MarkerCluster(name="Cluster").add_to(m)
-            path = r'.\Data\maps\req0.html'
+            path = '.\\Data\\maps\\req0.html'
             for result in lt.iterator(data_structs['lista_temblores']):
                 mssg=''
                 for key in result:
@@ -605,7 +605,7 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
             m= folium.Map()
             mCluster = MarkerCluster(name="Cluster").add_to(m)
-            path = r'.\Data\maps\req0.html'
+            path = '.\\Data\\maps\\req0.html'
             for result in lt.iterator(data_structs['lista_temblores']):
                 mssg=''
                 for key in result:
@@ -660,7 +660,7 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             m= folium.Map(tiles=MAP_TILE, 
                         attr=MAP_ATTRIBUTES)
             mCluster = MarkerCluster(name="Cluster").add_to(m)
-            path = r'.\Data\maps\req4.html'
+            path = '.\\Data\\maps\\req4.html'
             for result in lt.iterator(list_result):
                 mssg=''
                 for key in result:
@@ -678,7 +678,7 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             print('Ocurrió un error con el mapa. Mostrando textura por defecto.')
             m= folium.Map()
             mCluster = MarkerCluster(name="Cluster").add_to(m)
-            path = r'.\Data\maps\req4.html'
+            path = '.\\Data\\maps\\req4.html'
             for result in lt.iterator(list_result):
                 mssg=''
                 for key in result:
@@ -698,7 +698,7 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             m= folium.Map(tiles=MAP_TILE, 
                         attr= MAP_ATTRIBUTES)
             mCluster = MarkerCluster(name="Cluster").add_to(m)
-            path = r'.\Data\maps\req6.html'
+            path = '.\\Data\\maps\\req6.html'
             for result in lt.iterator(list_result):
                 mssg=''
                 for key in result:
@@ -723,7 +723,7 @@ def req_8(data_structs, req, list_result=None, lat=0, long=0, radius=0):
             print(f'An error occured. Check your internet connection \n')
             m= folium.Map()
             mCluster = MarkerCluster(name="Cluster").add_to(m)
-            path = r'.\Data\maps\req6.html'
+            path = '.\\Data\\maps\\req6.html'
             for result in lt.iterator(list_result):
                 mssg=''
                 for key in result:
