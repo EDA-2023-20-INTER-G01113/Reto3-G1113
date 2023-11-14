@@ -102,7 +102,8 @@ def print_req_1(control):
         for elem in x['elements']:
             lista.append(elem)
     print(f'{tabulate(lista,headers="keys",tablefmt="grid")}')
-
+    print(f'\n')
+    print(r'Open \Data\maps\req1.html on your browser to see an interactive map with your results! (must execute req8 first)')
 def print_req_2(control):
     """
         Función que imprime la solución del Requerimiento 2 en consola
@@ -119,15 +120,27 @@ def print_req_2(control):
     print(f'\n')
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
-    print(r'Open \Data\maps\req2.html on your browser to see an interactive map with your results!')
+    print(r'Open \Data\maps\req2.html on your browser to see an interactive map with your results! (must execute req8 first)')
 
 
 def print_req_3(control):
     """
         Función que imprime la solución del Requerimiento 3 en consola
     """
+    resultado,cantidad= (controller.req_3(control))
+    print("La cantidad de eventos sismicos con esos parametros es de: "+ str(cantidad))
+    for x in lt.iterator(resultado):
+        lista = []
+        for elem in lt.iterator(x['details']):
+            lista.append(elem)
+        x['details']=tabulate(lista,headers="keys",tablefmt="grid")
+    elems = [x for x in lt.iterator(resultado)]
+    print(f'\n')
+    print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
+    print(f'\n')
+    print(r'Open \Data\maps\req3.html on your browser to see an interactive map with your results! (must execute req8 first)')
     # TODO: Imprimir el resultado del requerimiento 3
-    pass
+    
 
 
 def print_req_4(control):
@@ -145,7 +158,7 @@ def print_req_4(control):
     print(f'\n')
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
-    print(r'Open \Data\maps\req4.html on your browser to see an interactive map with your results!')
+    print(r'Open \Data\maps\req4.html on your browser to see an interactive map with your results! (must execute req8 first)')
 
 
 def print_req_5(control):
@@ -161,7 +174,8 @@ def print_req_5(control):
     print("Tamaño de la consulta: " + str(tamanio) + "los primeros y ultimos 3 del top 20: ")
     elems = [x for x in lt.iterator(respuesta)]
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
-
+    print(f'\n')
+    print(r'Open \Data\maps\req5.html on your browser to see an interactive map with your results! (must execute req8 first)')
 
 def print_req_6(control):
     """
@@ -193,11 +207,13 @@ def print_req_6(control):
     print(f'{tabulate(elems,headers="keys",tablefmt="grid")}')
     print(f'\n')
     print(f'\n')
-    print(r'Open \Data\maps\req6.html on your browser to see an interactive map with your results!')
+    print(r'Open \Data\maps\req6.html on your browser to see an interactive map with your results! (must execute req8 first)')
+
 def print_req_7(control):
     """
         Función que imprime la solución del Requerimiento 7 en consola
     """
+    print(controller.req_7(control))
     # TODO: Imprimir el resultado del requerimiento 7
     pass
 

@@ -140,6 +140,13 @@ def req_3(control):
     """
     Retorna el resultado del requerimiento 3
     """
+    profundidad=round(float(input("Ingrese la profundidad máxima: ")),3)
+    mag= round(float(input("Ingrese la magnitud mínima: ")),3)
+    resultado, cantidad = model.req_3(control,mag, profundidad)
+    if cantidad >6:
+        return model.get_data_3(resultado,10),cantidad
+    else:
+        return resultado, cantidad
     # TODO: Modificar el requerimiento 3
     pass
 
@@ -151,7 +158,7 @@ def req_4(control):
     # TODO: Modificar el requerimiento 4
     min_sig = float(input("Ingrese la significancia mínima del evento: "))
     max_gap = float(input("Ingrese la distancia azimutal máxima del evento: "))
-    results, leng, dates = model.req_4(control, min_sig, max_gap)
+    results, leng, dates  = model.req_4(control, min_sig, max_gap)
     r_size = lt.size(results)
     if r_size>6:
         return model.get_data_3(results,r_size),leng, dates, results
@@ -192,6 +199,7 @@ def req_7(control):
     """
     Retorna el resultado del requerimiento 7
     """
+    return model.req_7(control,"2020","Alaska", "mag")
     # TODO: Modificar el requerimiento 7
     pass
 
@@ -218,8 +226,15 @@ def req_8(control):
     elif req=='2':
         _, _,results = req_2(control)
         model.req_8(control, req, results)
+    elif req=='3':
+        results, _ = req_3(control)
+        results_list=lt.newList("ARRAY_LIST")
+        for x in lt.iterator(results):
+            for elem in lt.iterator(x['details']):
+                lt.addLast(results_list, elem)
+        model.req_8(control, req, results_list)
     elif req=='4':
-        _, _, _, results_list = req_4(control)
+        _, _, _,results_list = req_4(control)
         model.req_8(control, req, results_list)
     elif req=='5':
         _, _, results_list = req_5(control)
