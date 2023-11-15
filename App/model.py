@@ -357,9 +357,7 @@ def req_7(data_structs,año, titulo, condicion, bins):
                         diccionario[float(data[condicion])]=1
     minimo = om.minKey(mapa_de_lacondicon)
     maximo= om.maxKey(mapa_de_lacondicon)
-    usados = 0
-    for cada in lt.iterator(om.valueSet(mapa_de_lacondicon)):
-        usados+= int(cada)
+    usados = lt.size(om.valueSet(mapa_de_lacondicon))
     posible_lo(diccionario, bins, condicion, minimo,maximo)
     lista=sacas(mapa_data, condicion)
     return totales,cantidad_año, usados,minimo, maximo,lista
