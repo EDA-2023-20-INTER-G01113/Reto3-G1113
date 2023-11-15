@@ -291,7 +291,7 @@ def req_8(control):
         _, _, _, _, _, _, _, _, results_list, lat, long, radius,_ = req_6(control)   
         model.req_8(control, req, results_list, lat, long, radius)
     elif req=='7':
-        _, _, _, _, _, _, _,_, total_list = req_7(control)
+        _, _, _, _, _, _, _,_, _,_,total_list = req_7(control)
         model.req_8(control, req, total_list)
     end_time = get_time()
     delta_times = delta_time(start_time, end_time)
